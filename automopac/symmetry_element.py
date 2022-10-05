@@ -9,15 +9,19 @@ class symmetry_elemet:
     __slots__ = ['rotation', 'translation']
 
     def __init__(self, rotation: mpm.matrix, translation: mpm.matrix = None):
-        '''Matrix representation of symmetry element
-         Args:
+        
+        """Matrix representation of symmetry element
+
+        Args:
             rotation (mpm.matrix): 3x3 matrix representation of rotational part of symmetry element
-        '''
+            translation (mpm.matrix): translation part of symmetry element
+        """
+
         if rotation.rows == rotation.cols and rotation.cols == 3:
             self.rotation = rotation
         else:
             raise ValueError(
-                'Rotational part of symmetry element shoud be mpmath.matrix 3x3 size')
+                f'Rotational part of symmetry element shoud be mpmath.matrix 3x3 size instead {rotation}')
 
         self.translation = translation or mpm.matrix(3, 1)
         if translation.cols == 1 and translation.rows == 3:
@@ -27,6 +31,14 @@ class symmetry_elemet:
                 'Translational part of symmetry element shoud be mpmath.matrix 3x1 size')
 
     def rotation_eq(self, other):
+        """_summary_
+
+        Args:
+            other (symmetry_element): other symmetry element
+
+        Returns:
+            bool: shows if rotation part of two symmetry elements equal
+        """
         delta_rot = self.rotation - other.rotation
         # check if all elements in delta_rot is almost equal to 0
         return all(mpm.almosteq(delta_rot[i, j], 0, abs_eps=10**-(mpm.mp.dps - 2)) for i in range(2 + 1) for j in range(2 + 1))
@@ -49,10 +61,14 @@ class symmetry_elemet:
             
         return True if all(eq_list) else False
 
-    def find_order(self, limit=1000, tol=1e-30):
-        '''Try to find element order
+    def find_order(self, limit=1000, tol=1e-30, q:int=None):
+        '''Return q if given, else try to find element order.
         '''
+        
         # foolproof, infinite element can be here
+        if q:
+            return q
+
         for i in range(1, limit + 1):
             delta = self.rotation**i - mpm.diag([1, 1, 1])
             if all(mpm.almosteq(delta[i, i], 0, abs_eps=tol) for i in range(2 + 1)):
@@ -63,24 +79,19 @@ class symmetry_elemet:
         return float('inf')
 
     def get_all_powers(self):
-        n = self.find_order(self)
-        return {self ** i for i in range(1, n + 1)}
+        n = self.find_order()
+        if n == float('inf'):
+            raise ValueError(f'Order of element {self} to big or cannot be defined')
+        return tuple(self ** i for i in range(1, n + 1))
 
     def __eq__(self, other):
-        '''Check if rotational and translational part of symmetry elements is exacly the same. **May not work if elements differ by translation vector**!!!
+        '''Check if rotational part of symmetry elements is exacly the same. **May give wrong answer if elements contain translation**!!!
         '''
-        # TODO: Rewrite this part using *_eq functions
         if isinstance(other, symmetry_elemet):
             delta_rot = self.rotation - other.rotation
-            delta_trans = self.translation - other.translation
             rot_eq = all(mpm.almosteq(delta_rot[i, j], 0, abs_eps=10**-(
                 mpm.mp.dps - 2)) for i in range(2 + 1) for j in range(2 + 1))
-            if other.translation != mpm.matrix(3, 1) or self.translation != mpm.matrix(3, 1):
-                warnings.warning(
-                    'Symmetry elements contain non-zero translation part! It is better to use eq() instead')
-            trans_eq = all(mpm.almosteq(
-                delta_trans[i], 0, abs_eps=10**-(mpm.mp.dps - 2)) for i in range(2 + 1))
-            return all((rot_eq, trans_eq))
+            return all(rot_eq)
 
     def __repr__(self):
         rot_ = '{} {} {}\n{} {} {}\n{} {} {}\n'.format(
