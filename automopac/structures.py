@@ -3,7 +3,7 @@ from collections.abc import Iterable
 
 import mpmath as mpm
 
-from symmetry import LineGroup, PointGroup, SrewAxis
+from symmetry import LineGroup, PointGroup, SrewAxis, symmetry_elemet
 
 
 class Abstract_Structure(ABC):
@@ -41,8 +41,11 @@ class Atom:
     '''Interface for atoms for easy manipulating with structures
     '''
     def __init__(self, atom:str, coords:Iterable):
-        self.atom = atom
-        self.coordinates = tuple(mpm.mpf(i) for i in coords)
+        self.atom: str = atom
+        self.coordinates: tuple[float] = tuple(mpm.mpf(i) for i in coords)
+        self.asymmetric: str = None # T or F
+        self.stabilizators: tuple[symmetry_elemet] = None
+        self.orbit_N: int = None
 
     @classmethod
     def from_string(line):
@@ -63,16 +66,16 @@ class Structure1D(Abstract_Structure):
     def xyz(self):
         pass
 
-    def get_monomer(self):
+    def monomer(self):
         pass
 
-    def get_symcell(self):
+    def symcell(self):
         pass
 
-    def get_group(self):
+    def group(self):
         pass
 
-    def get_cell():
+    def cell(self):
         pass
 
 class Molecule(Abstract_Structure):
@@ -84,14 +87,14 @@ class Molecule(Abstract_Structure):
     def xyz(self):
         pass
 
-    def get_monomer(self):
+    def monomer(self):
         pass
 
-    def get_symcell(self):
+    def symcell(self):
         pass
 
-    def get_group(self):
+    def group(self):
         pass
 
-    def get_cell():
+    def cell(self):
         pass

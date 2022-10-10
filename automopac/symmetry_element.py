@@ -49,15 +49,22 @@ class symmetry_elemet:
     def translation_eq(self, other, translation_vector=mpm.matrix(3, 1)):
         '''Check if translation part of two symmetry elements differ by translation vector
         '''
-        # TODO: Доделать функцию (vector / delta_trans almosteq int )
+        # T = n*A + x_0 -> 0 = n*A + x_0 - T -> 0 = n*A + delta
         delta_trans = self.translation - other.translation
         eq_list = []
         for i, j in zip(translation_vector, delta_trans):
+            
+            # Если трансляционная часть отличается на вектор трансляции -> True
+            try:
+                # Если findroot не может найти корни, то выдаёт ошибку
+                cond_ = mpm.almosteq(mpm.findroot(lambda n: n*i - j, 1), int(mpm.findroot(lambda n: n*i - j, 1)))
+            except:
+                cond_ = False
+
+            # Если трансляционная часть равна -> True
             if abs(i) == abs(j):
                 eq_list.append(True)
-            elif i == 0 and j != 0:
-                eq_list.append(False)
-            elif mpm.almosteq(j/i, int(j/i)):
+            elif cond_:
                 eq_list.append(True)
             else:
                 eq_list.append(False)
