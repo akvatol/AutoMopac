@@ -30,6 +30,9 @@ class symmetry_elemet:
             raise ValueError(
                 'Translational part of symmetry element shoud be mpmath.matrix 3x1 size')
 
+    def transform_atom():
+        pass
+
     def rotation_eq(self, other):
         """_summary_
 

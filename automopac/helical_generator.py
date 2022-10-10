@@ -1,6 +1,8 @@
 import numpy as np
 from collections import namedtuple
 
+from abc import ABC, abstractmethod
+
 def all_LG1F_generator(q_max:int, n:int , Q_interval:tuple):
     ''' Generate all LG with q <= q_max, n = n, and Q_interval[0] <= Q <= Q_interval[1].
 
@@ -38,4 +40,3 @@ def all_LG1F_generator(q_max:int, n:int , Q_interval:tuple):
             data.append(LineGroup1(Q, q*n, p*n, r, n))
 
     return tuple(sorted(data, key=lambda x: x.Q))
-

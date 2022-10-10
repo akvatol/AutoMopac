@@ -1,5 +1,10 @@
 from abc import ABC, abstractmethod
-from symmetry import SrewAxis, LineGroup, PointGroup
+from collections.abc import Iterable
+
+import mpmath as mpm
+
+from symmetry import LineGroup, PointGroup, SrewAxis
+
 
 class Abstract_Structure(ABC):
     '''Prototype for all structure types (Abstract factory)
@@ -13,38 +18,49 @@ class Abstract_Structure(ABC):
         pass
 
     @abstractmethod
-    def get_monomer():
+    def monomer():
         pass
 
     @abstractmethod
-    def get_symcell(self):
+    def symcell(self):
         pass
 
     @abstractmethod
-    def get_xyz(self):
+    def xyz(self):
         pass
 
     @abstractmethod
-    def get_cell(self):
+    def cell(self):
         pass
 
     @abstractmethod
-    def get_group(self):
+    def group(self):
         pass
 
 class Atom:
-    '''Interface for atoms for easy manipulating with structures (???)
-    TODO:
-        * Понять, нужен ли он мне
+    '''Interface for atoms for easy manipulating with structures
     '''
-    def __init__(self, atom, coords):
-        pass
+    def __init__(self, atom:str, coords:Iterable):
+        self.atom = atom
+        self.coordinates = tuple(mpm.mpf(i) for i in coords)
+
+    @classmethod
+    def from_string(line):
+        """Turn XYZ-type line into atoms
+
+        Args:
+            line (srt): _description_
+        """
+        atom, coords = line.split()[0], line.split()[0:]
+        coords = tuple(mpm.mpf(i) for i in coords)
+        return Atom(atom=atom, coords=coords)
 
 class Structure1D(Abstract_Structure):
     def __init__(self, symmetry: LineGroup, symcell: tuple) -> None:
         pass
 
-    def get_xyz(self):
+    @property
+    def xyz(self):
         pass
 
     def get_monomer(self):
@@ -61,9 +77,11 @@ class Structure1D(Abstract_Structure):
 
 class Molecule(Abstract_Structure):
     def __init__(self, symmetry: PointGroup, symcell: tuple) -> None:
-        pass
+        self.group = symmetry.group
+        self.symcell = symcell 
 
-    def get_xyz(self):
+    @property
+    def xyz(self):
         pass
 
     def get_monomer(self):
