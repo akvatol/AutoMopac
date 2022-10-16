@@ -43,22 +43,31 @@ class Atom:
     def __init__(self, atom:str, coords:Iterable):
         self.atom: str = atom
         self.coordinates: tuple[float] = tuple(mpm.mpf(i) for i in coords)
-        self.asymmetric: str = None # T or F
-        self.stabilizators: tuple[symmetry_elemet] = None
-        self.orbit_N: int = None
+        # вспомогательные атрибуты, могут понадобиться при работе с BigDFT
+        self._fragment: int = None
+        self._helix_num: int = None
+
+    def __repr__(self):
+        return f'{self.atom}\t{float(self.coordinates[0]):^20.12E} {float(self.coordinates[1]):^20.12E} {float(self.coordinates[2]):^20.12E}'
 
     @classmethod
-    def from_string(line):
+    def from_string(cls, line):
         """Turn XYZ-type line into atoms
 
         Args:
             line (srt): _description_
         """
-        atom, coords = line.split()[0], line.split()[0:]
+        atom, coords = line.split()[0], line.split()[1:]
         coords = tuple(mpm.mpf(i) for i in coords)
-        return Atom(atom=atom, coords=coords)
+        return cls(atom=atom, coords=coords)
 
-class Structure1D(Abstract_Structure):
+class Structure1DKernel(Abstract_Structure):
+    # Класс содержит всю логику работы с одномерными объектами
+    def __init__(self):
+        pass
+
+class Structure1D(Structure1DKernel):
+    # Интерфейс к ядру 
     def __init__(self, symmetry: LineGroup, symcell: tuple) -> None:
         pass
 
@@ -76,6 +85,10 @@ class Structure1D(Abstract_Structure):
         pass
 
     def cell(self):
+        pass
+
+class Helix:
+    def __init__(self, structure: Structure1D ,Q_min: float, Q_max: float, q_max: int = None, r_max: int = None):
         pass
 
 class Molecule(Abstract_Structure):
