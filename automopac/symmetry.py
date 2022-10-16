@@ -240,7 +240,7 @@ class ScrewAxis(AbstractGroup):
                 'z': symmetry_elemet(rotation=mpm.matrix([[mpm.cos(self.angle), mpm.sin(self.angle), 0.],
                                                         [mpm.sin(self.angle), mpm.cos(self.angle), 0.],
                                                         [0, 0, 1]]),
-                                    translation=mpm.matrix([A/q, 0, 0]))}
+                                    translation=mpm.matrix([A*p/q, 0, 0]))}
 
         self.generators = tuple([self.screw_generators[self.axis]])
 

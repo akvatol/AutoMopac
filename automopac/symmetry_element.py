@@ -1,7 +1,8 @@
 import warnings
 
 import mpmath as mpm
-
+mpm.mp.mpds = 100
+# Note that symmetry_element objects very sensitive to parameter mpm.mp.dps
 
 class symmetry_elemet:
     '''Matrix representation of symmetry element. Contain both translational and rotational part of symmetry element.
@@ -71,7 +72,7 @@ class symmetry_elemet:
             
         return True if all(eq_list) else False
 
-    def find_order(self, limit=1000, tol=1e-30, q:int=None):
+    def find_order(self, limit=1000, tol=1e-15, q:int=None):
         '''Return q if given, else try to find element order.
         '''
         
@@ -101,7 +102,7 @@ class symmetry_elemet:
             delta_rot = self.rotation - other.rotation
             rot_eq = all(mpm.almosteq(delta_rot[i, j], 0, abs_eps=10**-(
                 mpm.mp.dps - 2)) for i in range(2 + 1) for j in range(2 + 1))
-            return all(rot_eq)
+            return rot_eq
 
     def __repr__(self):
         rot_ = '{} {} {}\n{} {} {}\n{} {} {}\n'.format(
@@ -131,3 +132,4 @@ class symmetry_elemet:
         new_rotation = self.rotation**other
         new_translation = self.translation*other
         return symmetry_elemet(rotation=new_rotation, translation=new_translation)
+
