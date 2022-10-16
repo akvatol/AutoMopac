@@ -3,7 +3,7 @@ from collections.abc import Iterable
 
 import mpmath as mpm
 
-from symmetry import LineGroup, PointGroup, SrewAxis, symmetry_elemet
+from src.Symmetry import LineGroup, PointGroup, SrewAxis, symmetry_elemet
 
 
 class Abstract_Structure(ABC):

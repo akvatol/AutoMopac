@@ -1,3 +1,6 @@
+'''Basic part of all symmetry groups.
+'''
+
 import warnings
 
 import mpmath as mpm
@@ -14,8 +17,9 @@ class symmetry_elemet:
         """Matrix representation of symmetry element
 
         Args:
-            rotation (mpm.matrix): 3x3 matrix representation of rotational part of symmetry element
-            translation (mpm.matrix): translation part of symmetry element
+            rotation (mpm.matrix): 3x3 matrix representation of rotational part of symmetry element.
+            translation (mpm.matrix): translation part of symmetry element.
+            translation_vector (mpm.matrix): translation vector of whole system. Needs to identify true (E|A) element in LineGroups.
         """
 
         if rotation.rows == rotation.cols and rotation.cols == 3:

@@ -8,7 +8,7 @@ from itertools import count
 import mpmath as mpm
 import numpy as np
 
-from automopac.symmetry_element import symmetry_elemet
+from src.Symmetry.symmetry_element import symmetry_elemet
 
 '''Модуль содержит в себе классы симметрии молекул и полимеров. 
 Данные классы никак не взаимодействют со структурами, хранят группы и 
