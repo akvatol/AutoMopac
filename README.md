@@ -1,2 +1,2 @@
-# AutoMopac
+# HelSymG
 Helical structures calculation automatization 
