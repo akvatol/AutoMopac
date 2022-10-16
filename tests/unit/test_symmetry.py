@@ -35,6 +35,7 @@ def test_find_order():
     assert (make_cn(90)**3).find_order() == 4
     assert (make_cn(90)**2).find_order() == 2
     assert make_cn(160).find_order() == make_cn(40).find_order()
+    assert make_cn(120).find_order() == 3
     for i in range(1, 50 + 1):
         assert make_cn(360/i).find_order() == i
 
@@ -58,7 +59,10 @@ def test_point_group_pareser():
 
 def test_translation_eq():
     SE = symmetry_elemet(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]), translation=mpm.matrix([1, 0, 0]))
+    SE2 = symmetry_elemet(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]), translation=mpm.matrix([2.5, 0, 0]))
     assert not SE.translation_eq(I)
     assert SE.translation_eq(SE, translation_vector=mpm.matrix([1, 0, 0]))
     assert SE.translation_eq(SE)
     assert not SE.translation_eq(symmetry_elemet(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]), translation=mpm.matrix([2, 0, 0])), translation_vector=mpm.matrix([2, 0, 0]))
+    assert not SE.translation_eq(symmetry_elemet(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]), translation=mpm.matrix([4, 0, 0])), translation_vector=mpm.matrix([2, 0, 0]))
+    assert SE2.translation_eq(symmetry_elemet(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]), translation=mpm.matrix([5, 0, 0])), translation_vector=mpm.matrix([2.5, 0, 0]))
