@@ -2,6 +2,7 @@
 '''
 
 import warnings
+from src.Structure.structures import Atom
 
 import mpmath as mpm
 mpm.mp.mpds = 100
@@ -136,4 +137,16 @@ class symmetry_elemet:
         new_rotation = self.rotation**other
         new_translation = self.translation*other
         return symmetry_elemet(rotation=new_rotation, translation=new_translation)
+
+    def apply(self, atom:Atom) -> Atom:
+        """Apply symmetry element for given atom.
+
+        Args:
+            atom (Atom): some Atom object
+
+        Returns:
+            Atom: modified atom
+        """
+
+        return Atom(atom.atom, self.rotation*atom.coordinates + self.translation)
 

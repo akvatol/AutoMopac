@@ -42,7 +42,7 @@ class Atom:
     '''
     def __init__(self, atom:str, coords:Iterable):
         self.atom: str = atom
-        self.coordinates: tuple[float] = tuple(mpm.mpf(i) for i in coords)
+        self.coordinates: mpm.matrix = mpm.matrix([mpm.mpf(i) for i in coords])
         # вспомогательные атрибуты, могут понадобиться при работе с BigDFT
         self._fragment: int = None
         self._helix_num: int = None
