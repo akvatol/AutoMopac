@@ -1,21 +1,11 @@
 import pytest
-from automopac.symmetry_element import symmetry_elemet
-from automopac.symmetry import point_group_symbol_parser
+from src.Symmetry.symmetry_element import symmetry_element
+from src.Symmetry.utilites import point_group_symbol_parser
+from src.Symmetry.utilites import make_cn
 import mpmath as mpm
 mpm.mp.dps = 100
 
-def make_cn(angle):
-    angle = mpm.radians(angle)
-    rot = mpm.matrix(3)
-    rot[0, 0] = mpm.cos(angle)
-    rot[0, 1] = -mpm.sin(angle)
-    rot[1, 0] = mpm.sin(angle)
-    rot[1, 1] = mpm.cos(angle)
-    rot[2, 2] = 1
-    trans = mpm.matrix(3, 1)
-    return symmetry_elemet(rotation=rot, translation=trans)
-
-I = symmetry_elemet(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]), translation=mpm.matrix(3, 1))
+I = symmetry_element(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]), translation=mpm.matrix(3, 1))
 
 def test_symmetry_mul():
     assert make_cn(180)*make_cn(180) == make_cn(360)
@@ -58,11 +48,11 @@ def test_point_group_pareser():
     assert point_group_symbol_parser('DAG12WAS') == ('', '12', '')
 
 def test_translation_eq():
-    SE = symmetry_elemet(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]), translation=mpm.matrix([1, 0, 0]))
-    SE2 = symmetry_elemet(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]), translation=mpm.matrix([2.5, 0, 0]))
+    SE = symmetry_element(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]), translation=mpm.matrix([1, 0, 0]))
+    SE2 = symmetry_element(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]), translation=mpm.matrix([2.5, 0, 0]))
     assert not SE.translation_eq(I)
     assert SE.translation_eq(SE, translation_vector=mpm.matrix([1, 0, 0]))
     assert SE.translation_eq(SE)
-    assert not SE.translation_eq(symmetry_elemet(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]), translation=mpm.matrix([2, 0, 0])), translation_vector=mpm.matrix([2, 0, 0]))
-    assert not SE.translation_eq(symmetry_elemet(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]), translation=mpm.matrix([4, 0, 0])), translation_vector=mpm.matrix([2, 0, 0]))
-    assert SE2.translation_eq(symmetry_elemet(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]), translation=mpm.matrix([5, 0, 0])), translation_vector=mpm.matrix([2.5, 0, 0]))
+    assert not SE.translation_eq(symmetry_element(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]), translation=mpm.matrix([2, 0, 0])), translation_vector=mpm.matrix([2, 0, 0]))
+    assert not SE.translation_eq(symmetry_element(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]), translation=mpm.matrix([4, 0, 0])), translation_vector=mpm.matrix([2, 0, 0]))
+    assert SE2.translation_eq(symmetry_element(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]), translation=mpm.matrix([5, 0, 0])), translation_vector=mpm.matrix([2.5, 0, 0]))
