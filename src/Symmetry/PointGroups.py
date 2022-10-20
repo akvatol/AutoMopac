@@ -31,7 +31,6 @@ class PointGroup(GroupTemplate):
         return dict(n=self.n, I=self.I, U=self.U, v=self.v, h=self.h)
 
     def apply(self, atoms: tuple) -> tuple:
-        # TODO: Test it integration
         """Apply all symmetry elements for set of atoms.
 
         Args:
@@ -44,15 +43,16 @@ class PointGroup(GroupTemplate):
         return strucure
 
     def find_extra_generators(self) -> list:
-        # TODO
         extra_generators = []
         old_generators = self.generators
 
         for generator in old_generators:
+
             if old_generators.get(generator):
+
                 newer_generators = old_generators.copy()
                 del newer_generators[generator]
-                newer_group = make_group(self.generators)
+                newer_group = make_group(newer_generators)
 
                 if newer_group == self.group:
                     extra_generators.append(generator)
