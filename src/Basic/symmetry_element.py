@@ -63,7 +63,7 @@ class symmetry_element:
     def apply(self, atom: Atom) -> Atom:
         # TODO: test it
         """Apply symmetry element to given atom."""
-        return Atom(atom.atom, self.rotation * atom.coordinates + self.translation)
+        return Atom(atom.atom, mpm.chop(self.rotation * atom.coordinates + self.translation))
 
     def rotation_eq(self, other):
         """Check if rotational part of two symmetry elements are equal."""
