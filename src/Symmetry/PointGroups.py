@@ -1,10 +1,8 @@
 from ..Basic.Templates import GroupTemplate
-from src.Basic.symmetry_element import symmetry_elemet
 from src.Symmetry.utilites import make_generators, make_group
 from dataclasses import dataclass, field
 
-
-@dataclass(frozen=True, slots=True)
+@dataclass(slots=True)
 class PointGroup(GroupTemplate):
     n: int = 1
     v: bool = False
@@ -16,10 +14,8 @@ class PointGroup(GroupTemplate):
     group: frozenset = field(init=False, repr=False)
 
     def __post_init__(self):
-        generators = make_generators(
-            n=self.n, v=self.v, h=self.h, I=self.I, U=self.U, axis=self.axis
-        )
-        group = make_group(self.generators)
+        self.generators = make_generators(dict(n=self.n, v=self.v, h=self.h, I=self.I, U=self.U, axis=self.axis))
+        self.group = make_group(self.generators)
 
     @classmethod
     def from_dict(cls, parameter: dict):

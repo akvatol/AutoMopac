@@ -169,29 +169,30 @@ def make_generators(parameters: dict) -> dict[str:symmetry_element]:
             "I": I,
             "h": sigma_yz,
             "U": C2y,
-            "n": make_cn_x,
+            "n": make_cn_x(parameters.get('n', 1)),
         },
         "y": {
             "v": sigma_yz,
             "I": I,
             "h": sigma_xz,
             "U": C2z,
-            "n": make_cn_y,
+            "n": make_cn_y(parameters.get('n', 1)),
         },
         "z": {
             "v": sigma_xz,
             "I": I,
             "h": sigma_yx,
             "U": C2x,
-            "n": make_cn_z,
+            "n": make_cn_z(parameters.get('n', 1)),
         },
     }
 
-    preset = presets.get("axis", "x")
+    preset = presets.get(parameters.get('axis'), "x")
 
-    generators = {name:preset[name] for name in parameters if parameters.get(name)}
+    # TODO: This 
+    generators_ = {name: preset.get(name) for name in parameters if parameters.get(name) and name != 'axis'}
 
-    return generators
+    return generators_
 
 def make_group(generators: frozenset) -> frozenset:
     # TODO Написать
