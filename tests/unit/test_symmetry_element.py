@@ -27,15 +27,14 @@ def test__symmetry_element_order():
     assert (make_cn(4)**2).order == 2
     assert make_cn(9).order == (make_cn(18)*make_cn(18)).order
     assert make_cn(3).order == 3
-    for i in range(1, 50 + 1):
+    for i in range(1, 20 + 1):
         assert make_cn(i).order == i
 
 def test_if_symmetry_element_in():
     assert make_cn(2) in [make_cn(4), make_cn(4)**2]
     assert make_cn(1) in [make_cn(4)**i for i in range(4)]
     assert make_cn(9) in [make_cn(9)**i for i in range(16)]
-    assert make_cn(90) in make_cn(180).get_all_powers()
-    
+
 def test_symmetry_element__raises():
     with pytest.raises(ValueError):
         make_cn(4)*2
