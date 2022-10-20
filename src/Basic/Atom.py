@@ -29,3 +29,6 @@ class Atom:
         atom, coords = line.split()[0], line.split()[1:]
         coords = mpm.matrix([mpm.mpf(i) for i in coords])
         return cls(atom=atom, coordinates=coords)
+
+    def __hash__(self) -> int:
+        return hash(str(self))
