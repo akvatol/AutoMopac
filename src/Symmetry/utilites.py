@@ -169,21 +169,21 @@ def make_generators(parameters: dict) -> dict[str:symmetry_element]:
             "I": I,
             "h": sigma_yz,
             "U": C2y,
-            "Cn": make_cn_x,
+            "n": make_cn_x,
         },
         "y": {
             "v": sigma_yz,
             "I": I,
             "h": sigma_xz,
             "U": C2z,
-            "Cn": make_cn_y,
+            "n": make_cn_y,
         },
         "z": {
             "v": sigma_xz,
             "I": I,
             "h": sigma_yx,
             "U": C2x,
-            "Cn": make_cn_z,
+            "n": make_cn_z,
         },
     }
 

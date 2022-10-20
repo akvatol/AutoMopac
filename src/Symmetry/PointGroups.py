@@ -1,48 +1,41 @@
 from ..Basic.Templates import GroupTemplate
 from src.Basic.symmetry_element import symmetry_elemet
 from src.Symmetry.utilites import make_generators, make_group
+from dataclasses import dataclass, field
 
+
+@dataclass(frozen=True, slots=True)
 class PointGroup(GroupTemplate):
+    n: int = 1
+    v: bool = False
+    h: bool = False
+    I: bool = False
+    U: bool = False
+    axis: str = "x"
+    generators: dict = field(init=False, repr=False)
+    group: frozenset = field(init=False, repr=False)
 
-    def __init__(self, n: int = 1, v:bool = False, h:bool = False, I: bool = False, U: bool = False, axis: str = 'x'):
-        self.__n = n
-        self.__v = v
-        self.__h = h
-        self.__I = I
-        self.__U = U
-        self.axis = axis
+    def __post_init__(self):
+        generators = make_generators(
+            n=self.n, v=self.v, h=self.h, I=self.I, U=self.U, axis=self.axis
+        )
+        group = make_group(self.generators)
 
+    @classmethod
+    def from_dict(cls, parameter: dict):
+        return cls(
+            n=parameter.get("n", 1),
+            I=parameter.get("I", False),
+            U=parameter.get("U", False),
+            v=parameter.get("v", False),
+            h=parameter.get("h", False),
+        )
 
-    @property
-    def n(self):
-        return self.__n
-
-    @property
-    def v(self):
-        return self.__v
-
-    @property
-    def h(self):
-        return self.__h
-
-    @property
-    def I(self):
-        return self.__I
-
-    @property
-    def U(self):
-        return self.__U
-
-    @property
-    def generators(self):
-        return make_generators(n=self.n, v=self.v, h=self.h, I=self.I, U=self.U, axis=self.axis)
-
-
-    @property
-    def group(self):
-        return make_group(self.generators)
+    def to_dict(self):
+        return dict(n=self.n, I=self.I, U=self.U, v=self.v, h=self.h)
 
     def apply(self, atoms: tuple) -> tuple:
+        # TODO: Test it integration
         """Apply all symmetry elements for set of atoms.
 
         Args:
@@ -54,12 +47,38 @@ class PointGroup(GroupTemplate):
         strucure = frozenset([SE.apply(atom) for SE in self.group for atom in atoms])
         return strucure
 
-    def find_extra_generators(self):
+    def find_extra_generators(self) -> list:
         # TODO
-        old_group = self.group
-        
-        pass
+        extra_generators = []
+        old_generators = self.generators
 
-    def popgen(self):
-        #TODO
-        pass
+        for generator in old_generators:
+            if old_generators.get(generator):
+                newer_generators = old_generators.copy()
+                del newer_generators[generator]
+                newer_group = make_group(self.generators)
+
+                if newer_group == self.group:
+                    extra_generators.append(generator)
+
+        return extra_generators
+
+    def popgen(self, gen_name: str):
+        """Delete generator and return (deleted generator, new PointGroup)
+
+        Args:
+            gen_name (str): Name of generator for deleting
+        """
+
+        generator = self.generators.get(gen_name)
+
+        if generator:
+            if gen_name == 'n':
+                new_gen_value = 1
+            else:
+                new_gen_value = False
+
+            parameters = self.to_dict()
+            parameters[gen_name] = new_gen_value
+
+        return generator, self.from_dict(parameter=parameters)
