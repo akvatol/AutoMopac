@@ -146,9 +146,9 @@ def make_cn_y(n: int) -> symmetry_element:
     angle = mpm.radians(360 / n)
     rot = mpm.matrix(
         [
-            [mpm.cos(angle), -mpm.sin(angle), 0.0],
+            [mpm.cos(angle), 0, -mpm.sin(angle)],
             [0, 1, 0],
-            [0.0, mpm.sin(angle), mpm.cos(angle)],
+            [mpm.sin(angle), 0.0, mpm.cos(angle)],
         ]
     )
     trans = mpm.matrix(3, 1)
