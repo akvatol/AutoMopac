@@ -50,3 +50,7 @@ class GroupTemplate:
     @abstractmethod
     def get_orbit(self, atom):
         pass
+
+    @abstractmethod
+    def get_stabilizer(self, atom):
+        pass
