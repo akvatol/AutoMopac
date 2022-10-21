@@ -3,7 +3,9 @@ import mpmath as mpm
 import pytest
 from src.Basic.symmetry_element import symmetry_element
 from src.Symmetry.PointGroups import PointGroup
-from src.Symmetry.utilites import make_cn_x as make_cn
+from src.Symmetry.utilites import SymmetryElements
+
+make_cn = SymmetryElements.make_cn_x
 
 @pytest.mark.parametrize(
     "group, expected",
@@ -85,4 +87,3 @@ def test_popgen():
 )
 def test_find_extra_generators(group, expected):
     assert group.find_extra_generators() == expected
-

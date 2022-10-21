@@ -1,15 +1,17 @@
 import pytest
 from src.Basic.symmetry_element import symmetry_element
 from src.Symmetry.utilites import point_group_symbol_parser
-from src.Symmetry.utilites import make_cn_z as make_cn
+from src.Symmetry.utilites import SymmetryElements
 import mpmath as mpm
 mpm.mp.dps = 100
 
-I = symmetry_element(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]), translation=mpm.matrix(3, 1))
+I = SymmetryElements.I
+make_cn = SymmetryElements.make_cn_z
+
 
 def test_symmetry_element_mul():
     assert make_cn(2)*make_cn(2) == make_cn(1)
-    assert  make_cn(4)*make_cn(3) != make_cn(4)
+    assert make_cn(4)*make_cn(3) != make_cn(4)
     assert make_cn(4)*make_cn(2)*make_cn(4) == make_cn(1)
 
 def test_symmetry_element_pow():

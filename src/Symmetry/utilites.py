@@ -5,8 +5,87 @@ import mpmath as mpm
 import numpy as np
 from src.Basic.Atom import Atom
 from src.Basic.symmetry_element import symmetry_element
+from dataclasses import dataclass
 
 mpm.mp.mpds = 100
+
+class Singleton(type):
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super().__call__(*args, **kwargs)
+        return cls._instances[cls]
+@dataclass(slots=True, frozen=True)
+class SymmetryElements(metaclass=Singleton):
+    I = symmetry_element(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]))
+    sigma_xz = symmetry_element(rotation=mpm.matrix([[1, 0, 0], [0, -1, 0], [0, 0, 1]]))
+    sigma_yz = symmetry_element(rotation=mpm.matrix([[-1, 0, 0], [0, 1, 0], [0, 0, 1]]))
+    sigma_yx = symmetry_element(rotation=mpm.matrix([[1, 0, 0], [0, 1, 0], [0, 0, -1]]))
+    C2x = symmetry_element(rotation=mpm.matrix([[1, 0, 0], [0, -1, 0], [0, 0, -1]]))
+    C2y = symmetry_element(rotation=mpm.matrix([[-1, 0, 0], [0, 1, 0], [0, 0, -1]]))
+    C2z = symmetry_element(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, 1]]))
+
+    @staticmethod
+    def make_cn_z(n: int) -> symmetry_element:
+        """Support function for make Cn symmetry element
+
+        Args:
+            n (int): axis order
+
+        Returns:
+            symmetry_element: Cn group generator
+        """
+        angle = mpm.radians(360 / n)
+        rot = mpm.matrix(
+            [[mpm.cos(angle), -mpm.sin(angle), 0.0], 
+            [mpm.sin(angle), mpm.cos(angle), 0.0],
+            [0, 0, 1]],
+        )
+        trans = mpm.matrix(3, 1)
+        return symmetry_element(rotation=rot, translation=trans)
+
+    @staticmethod
+    def make_cn_x(n: int) -> symmetry_element:
+        """Support function for make Cn symmetry element
+
+        Args:
+            n (int): axis order
+
+        Returns:
+            symmetry_element: Cn group generator
+        """
+        angle = mpm.radians(360 / n)
+        rot = mpm.matrix(
+            [
+                [1, 0, 0],
+                [0.0, mpm.cos(angle), -mpm.sin(angle)],
+                [0.0, mpm.sin(angle), mpm.cos(angle)],
+            ]
+        )
+        trans = mpm.matrix(3, 1)
+        return symmetry_element(rotation=rot, translation=trans)
+
+    @staticmethod
+    def make_cn_y(n: int) -> symmetry_element:
+        """Support function for make Cn symmetry element
+
+        Args:
+            n (int): axis order
+
+        Returns:
+            symmetry_element: Cn group generator
+        """
+        angle = mpm.radians(360 / n)
+        rot = mpm.matrix(
+            [
+                [mpm.cos(angle), 0, -mpm.sin(angle)],
+                [0, 1, 0],
+                [mpm.sin(angle), 0.0, mpm.cos(angle)],
+            ]
+        )
+        trans = mpm.matrix(3, 1)
+        return symmetry_element(rotation=rot, translation=trans)
 
 def all_LG1F_generator(q_max: int, n: int, Q_interval: tuple) -> tuple:
     """Generate all LG with q <= q_max, n = n, and Q_interval[0] <= Q <= Q_interval[1].
@@ -85,75 +164,6 @@ def point_group_symbol_parser(symbol: str) -> tuple:
             return s1, s2, s3
 
 
-# TODO: Make it better 
-I = symmetry_element(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]))
-sigma_xz = symmetry_element(rotation=mpm.matrix([[1, 0, 0], [0, -1, 0], [0, 0, 1]]))
-sigma_yz = symmetry_element(rotation=mpm.matrix([[-1, 0, 0], [0, 1, 0], [0, 0, 1]]))
-sigma_yx = symmetry_element(rotation=mpm.matrix([[1, 0, 0], [0, 1, 0], [0, 0, -1]]))
-C2x = symmetry_element(rotation=mpm.matrix([[1, 0, 0], [0, -1, 0], [0, 0, -1]]))
-C2y = symmetry_element(rotation=mpm.matrix([[-1, 0, 0], [0, 1, 0], [0, 0, -1]]))
-C2z = symmetry_element(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, 1]]))
-
-# TODO: This code smells
-def make_cn_z(n: int) -> symmetry_element:
-    """Support function for make Cn symmetry element
-
-    Args:
-        n (int): axis order
-
-    Returns:
-        symmetry_element: Cn group generator
-    """
-    angle = mpm.radians(360 / n)
-    rot = mpm.matrix(
-        [[mpm.cos(angle), -mpm.sin(angle), 0.0], 
-        [mpm.sin(angle), mpm.cos(angle), 0.0],
-        [0, 0, 1]],
-    )
-    trans = mpm.matrix(3, 1)
-    return symmetry_element(rotation=rot, translation=trans)
-
-def make_cn_x(n: int) -> symmetry_element:
-    """Support function for make Cn symmetry element
-
-    Args:
-        n (int): axis order
-
-    Returns:
-        symmetry_element: Cn group generator
-    """
-    angle = mpm.radians(360 / n)
-    rot = mpm.matrix(
-        [
-            [1, 0, 0],
-            [0.0, mpm.cos(angle), -mpm.sin(angle)],
-            [0.0, mpm.sin(angle), mpm.cos(angle)],
-        ]
-    )
-    trans = mpm.matrix(3, 1)
-    return symmetry_element(rotation=rot, translation=trans)
-
-
-def make_cn_y(n: int) -> symmetry_element:
-    """Support function for make Cn symmetry element
-
-    Args:
-        n (int): axis order
-
-    Returns:
-        symmetry_element: Cn group generator
-    """
-    angle = mpm.radians(360 / n)
-    rot = mpm.matrix(
-        [
-            [mpm.cos(angle), 0, -mpm.sin(angle)],
-            [0, 1, 0],
-            [mpm.sin(angle), 0.0, mpm.cos(angle)],
-        ]
-    )
-    trans = mpm.matrix(3, 1)
-    return symmetry_element(rotation=rot, translation=trans)
-
 def make_generators(parameters: dict) -> dict[str:symmetry_element]:
     """_summary_
 
@@ -165,25 +175,25 @@ def make_generators(parameters: dict) -> dict[str:symmetry_element]:
     # http://www.pci.tu-bs.de/aggericke/PC4e/Kap_IV/Matrix_Symm_Op.htm
     presets = {
         "x": {
-            "v": sigma_xz,
-            "I": I,
-            "h": sigma_yz,
-            "U": C2y,
-            "n": make_cn_x(parameters.get('n', 1)),
+            "v": SymmetryElements.sigma_xz,
+            "I": SymmetryElements.I,
+            "h": SymmetryElements.sigma_yz,
+            "U": SymmetryElements.C2y,
+            "n": SymmetryElements.make_cn_x(n=parameters.get('n', 1)),
         },
         "y": {
-            "v": sigma_yz,
-            "I": I,
-            "h": sigma_xz,
-            "U": C2z,
-            "n": make_cn_y(parameters.get('n', 1)),
+            "v": SymmetryElements.sigma_yz,
+            "I": SymmetryElements.I,
+            "h": SymmetryElements.sigma_xz,
+            "U": SymmetryElements.C2z,
+            "n": SymmetryElements.make_cn_y(n=parameters.get('n', 1)),
         },
         "z": {
-            "v": sigma_xz,
-            "I": I,
-            "h": sigma_yx,
-            "U": C2x,
-            "n": make_cn_z(parameters.get('n', 1)),
+            "v": SymmetryElements.sigma_xz,
+            "I": SymmetryElements.I,
+            "h": SymmetryElements.sigma_yx,
+            "U": SymmetryElements.C2x,
+            "n": SymmetryElements.make_cn_z(n=parameters.get('n', 1)),
         },
     }
 
