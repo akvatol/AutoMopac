@@ -87,6 +87,29 @@ class SymmetryElements(metaclass=Singleton):
         trans = mpm.matrix(3, 1)
         return symmetry_element(rotation=rot, translation=trans)
 
+# TODO: refactor this
+# http://www.pci.tu-bs.de/aggericke/PC4e/Kap_IV/Matrix_Symm_Op.htm
+PRESETS = {
+    "x": {
+        "v": SymmetryElements.sigma_xz,
+        "I": SymmetryElements.I,
+        "h": SymmetryElements.sigma_yz,
+        "U": SymmetryElements.C2y,
+    },
+    "y": {
+        "v": SymmetryElements.sigma_yz,
+        "I": SymmetryElements.I,
+        "h": SymmetryElements.sigma_xz,
+        "U": SymmetryElements.C2z,
+    },
+    "z": {
+        "v": SymmetryElements.sigma_xz,
+        "I": SymmetryElements.I,
+        "h": SymmetryElements.sigma_yx,
+        "U": SymmetryElements.C2x
+    },
+}
+
 def all_LG1F_generator(q_max: int, n: int, Q_interval: tuple) -> tuple:
     """Generate all LG with q <= q_max, n = n, and Q_interval[0] <= Q <= Q_interval[1].
 
@@ -163,7 +186,6 @@ def point_group_symbol_parser(symbol: str) -> tuple:
             s3 = search.group(3)
             return s1, s2, s3
 
-
 def make_generators(parameters: dict) -> dict[str:symmetry_element]:
     """_summary_
 
@@ -171,33 +193,17 @@ def make_generators(parameters: dict) -> dict[str:symmetry_element]:
         _type_: _description_
     """
 
-    # TODO: refactor this
-    # http://www.pci.tu-bs.de/aggericke/PC4e/Kap_IV/Matrix_Symm_Op.htm
-    presets = {
-        "x": {
-            "v": SymmetryElements.sigma_xz,
-            "I": SymmetryElements.I,
-            "h": SymmetryElements.sigma_yz,
-            "U": SymmetryElements.C2y,
-            "n": SymmetryElements.make_cn_x(n=parameters.get('n', 1)),
-        },
-        "y": {
-            "v": SymmetryElements.sigma_yz,
-            "I": SymmetryElements.I,
-            "h": SymmetryElements.sigma_xz,
-            "U": SymmetryElements.C2z,
-            "n": SymmetryElements.make_cn_y(n=parameters.get('n', 1)),
-        },
-        "z": {
-            "v": SymmetryElements.sigma_xz,
-            "I": SymmetryElements.I,
-            "h": SymmetryElements.sigma_yx,
-            "U": SymmetryElements.C2x,
-            "n": SymmetryElements.make_cn_z(n=parameters.get('n', 1)),
-        },
-    }
+    axis = parameters.get('axis', 'x')
+    preset = PRESETS.get(axis)
 
-    preset = presets.get(parameters.get('axis'), "x")
+    if axis == 'x':
+        make_cn = SymmetryElements.make_cn_x(n=parameters.get('n', 1))
+    elif axis == 'z':
+        make_cn = SymmetryElements.make_cn_z(n=parameters.get('n', 1))
+    else:
+        make_cn = SymmetryElements.make_cn_y(n=parameters.get('n', 1))
+
+    preset.update(dict(n=make_cn))
 
     # TODO: This 
     generators_ = {name: preset.get(name) for name in parameters if parameters.get(name) and name != 'axis'}
@@ -205,7 +211,7 @@ def make_generators(parameters: dict) -> dict[str:symmetry_element]:
     return generators_
 
 def make_group(generators: frozenset) -> frozenset:
-    # TODO Написать
+    # TODO Docstring
     """_summary_
 
     Args:
