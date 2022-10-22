@@ -1,7 +1,7 @@
 import pytest
 from src.Basic.symmetry_element import symmetry_element
-from src.Symmetry.utilites import point_group_symbol_parser
-from src.Symmetry.utilites import SymmetryElements
+from src.Basic.utilites import point_group_symbol_parser
+from src.Basic.utilites import SymmetryElements
 import mpmath as mpm
 mpm.mp.dps = 100
 

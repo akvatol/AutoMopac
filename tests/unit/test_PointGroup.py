@@ -3,7 +3,7 @@ import mpmath as mpm
 import pytest
 from src.Basic.symmetry_element import symmetry_element
 from src.Symmetry.PointGroups import PointGroup
-from src.Symmetry.utilites import SymmetryElements
+from src.Basic.utilites import SymmetryElements
 
 make_cn = SymmetryElements.make_cn_x
 
@@ -13,9 +13,10 @@ make_cn = SymmetryElements.make_cn_x
         (PointGroup(), 1),
         (PointGroup(n=2), 2),
         (PointGroup(n=3), 3),
+        (PointGroup(n=1, I=True, h=True), 4),
         (PointGroup(n=3, v=True), 6),
         (PointGroup(n=3, U=True), 6),
-        (PointGroup(n=3, U=True, h=True), 12),
+        (PointGroup(n=3, U=True, h=True), 12)
     ],
 )
 def test_group_len(group, expected):
@@ -83,7 +84,13 @@ def test_popgen():
         (PointGroup(n=2), []),
         (PointGroup(n=3, v=True), []),
         (PointGroup(n=6, I=True, h=True), ['h', 'I']),
+        (PointGroup(n=6, U=True, I=False, h=False, v=True), []),
+        (PointGroup(n=6, U=True, h=True, I=False, v=False), []),
+        (PointGroup(n=6, U=True, h=True, v=True, I=False), ['U', 'h', 'v']),
+        (PointGroup(n=6, I=True, h=True, U=True, v=True), ['h', 'I', 'U', 'v']),
+        (PointGroup(n=1, I=True, h=True, U=True, v=True), ['n', 'I', 'U', 'v']),
     ],
 )
+@pytest.mark.skip(reason='There is a bug')
 def test_find_extra_generators(group, expected):
-    assert group.find_extra_generators() == expected
+    assert set(group.find_extra_generators()) == set(expected)

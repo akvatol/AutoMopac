@@ -1,7 +1,7 @@
 from src.Basic.symmetry_element import symmetry_element
 from ..Basic.Templates import GroupTemplate
 from ..Basic.Atom import Atom
-from src.Symmetry.utilites import make_generators, make_group, detect_group
+from src.Basic.utilites import make_generators, make_group, detect_group
 from attr import frozen, field
 
 @frozen(slots=True)
