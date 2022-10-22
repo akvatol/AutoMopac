@@ -1,18 +1,15 @@
 from abc import ABC, abstractmethod
 
 class StructureTemplate(ABC):
-    '''Prototype for all structure types (Abstract factory)
-
-    TODO:
-        * Prototype for all types of structures (3D, 2D, 1D, 0D)
-        * Contains information about structure
-        * Interface to manipulate with structure (Supercell, monomer scrolling, N_merization)
+    '''Prototype for all structure types.
+        * Prototype for 1D structures
+        * Interface to manipulate with structure
     '''
     def __init__(self):
         pass
 
     @abstractmethod
-    def monomer():
+    def monomer(self):
         pass
 
     @abstractmethod
@@ -28,10 +25,20 @@ class StructureTemplate(ABC):
         pass
 
     @abstractmethod
-    def group(self):
+    def reduce_monomer_symmetry(self):
+        pass
+
+    @abstractmethod
+    def reduce_screw_axis(self):
+        pass
+
+    @abstractmethod
+    def analyze_orbits(self):
         pass
 
 class GroupTemplate:
+    """Prototype for all group types.
+    """
     def __init__(self):
         pass
 
@@ -53,4 +60,8 @@ class GroupTemplate:
 
     @abstractmethod
     def get_stabilizer(self, atom):
+        pass
+
+    @abstractmethod
+    def copy(self):
         pass
