@@ -214,8 +214,9 @@ def make_generators(parameters: dict) -> dict[str, symmetry_element]:
 
     return generators_
 
-def make_group(generators: frozenset) -> frozenset:
+def make_group(generators: frozenset) -> tuple:
     # TODO Docstring
+    # TODO: regularize orders of group elements
     """_summary_
 
     Args:

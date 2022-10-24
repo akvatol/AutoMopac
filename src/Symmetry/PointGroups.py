@@ -7,6 +7,7 @@ from attrs import frozen, field
 
 @frozen(slots=True)
 class PointGroupBase(GroupTemplate):
+    # TODO: Документация
     n: int = field(default=1, kw_only=True)
     v: bool = field(default=False)
     h: bool = field(default=False)
@@ -79,7 +80,7 @@ class PointGroup(PointGroupBase):
             subgroup = self.from_dict(subgroup_parameters)
         return subgroup
 
-    def apply(self, atoms: list[Atom]) -> frozenset[Atom]:
+    def apply(self, atoms: list[Atom]) -> tuple[Atom]:
         """Apply all symmetry elements for set of atoms.
 
         Args:
@@ -88,8 +89,16 @@ class PointGroup(PointGroupBase):
         Returns:
             tuple: generated structue (N1, N1`, N1``, ..., N2, N2`, N2``, ...)
         """
-        strucure = frozenset([SE.apply(atom) for SE in self.group for atom in atoms])
-        return strucure
+        # TODO изменить
+        structure = []
+        for atom in atoms:
+            for SE in self.group:
+                new_atom = SE.apply(atom)
+                if new_atom in structure:
+                    continue
+                else:
+                    structure.append(new_atom)
+        return tuple(structure)
 
     def popgen(self, gen_name: str):
         """Delete generator and return (deleted generator, new PointGroup)
@@ -112,13 +121,16 @@ class PointGroup(PointGroupBase):
         return generator, self.from_dict(parameter=parameters)
 
     def copy(self):
+        # TODO: Docstring
         return self.from_dict(self.to_dict())
 
     def to_dict(self):
+        # TODO: Docstring
         return dict(n=self.n, I=self.I, U=self.U, v=self.v, h=self.h)
 
     @classmethod
     def from_dict(cls, parameter: dict):
+        # TODO: Docstring
         return cls(
             n=parameter.get("n", 1),
             I=parameter.get("I", False),

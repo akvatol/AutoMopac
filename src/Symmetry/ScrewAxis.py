@@ -11,6 +11,7 @@ mpm.mp.dps = 100
 
 @frozen(slots=True)
 class ScrewAxisBase(GroupTemplate):
+    # TODO: Docstring
     q: int = field(kw_only=True, default=1, validator=_positive_validator)
     p: int = field(kw_only=True, default=1, validator=_positive_validator)
     A: int = field(kw_only=True, validator=_positive_validator)
@@ -63,6 +64,7 @@ class ScrewAxisBase(GroupTemplate):
 class ScrewAxis(ScrewAxisBase):
 
     def reduce(self, index: int):
+        # TODO: Docstring
         if index < self.Q:
             # TODO: Перевести
             raise ValueError("Группа не может быть меньше чем порядок оси Q")
@@ -74,6 +76,7 @@ class ScrewAxis(ScrewAxisBase):
         return SA
 
     def _reduce_screw_axis(self, index: int ) -> list[int]:
+        # TODO: Docstring
         if self.q % index == 0:
             new_q = self.q / index
         else:
@@ -82,11 +85,15 @@ class ScrewAxis(ScrewAxisBase):
         return new_q, new_p
 
     def apply(self, atoms:list[Atom]) -> frozenset:
-        strucure = frozenset([SE.apply(atom) for SE in self.group for atom in atoms])
+        # TODO: Docstring
+        # TODO: Checck if Q = 1 SA works fine
+        # * Screw-axis always change the atom
+        strucure = tuple([SE.apply(atom) for SE in self.group for atom in atoms])
         return strucure
 
     def get_stabilizer(self, atom:Atom):
-        # ! Stabilizer of screw axis is L1 Group
+        # TODO: Docstring
+        # * Stabilizer of screw axis is L1 Group
         # ? Do i need that?
         return ScrewAxis(q=1, p=1, A=self.A)
 
@@ -107,11 +114,14 @@ class ScrewAxis(ScrewAxisBase):
         return orbit
 
     def to_dict(self):
+        # TODO: Docstring
         return {'q': self.q, 'p':self.p, 'A':self.A}
 
     @classmethod
     def from_dict(cls, parameters:dict[str, int]):
+        # TODO: Docstring
         return cls(q=parameters.get('q', 1), p=parameters.get('p', 1), A=parameters.get('A'), axis=parameters.get('axis', 'x'))
 
     def copy(self):
+        # TODO: Docstring
         return self.from_dict(self.to_dict())
