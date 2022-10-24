@@ -122,16 +122,27 @@ class symmetry_element:
     def __mul__(self, other):
         """Produce new symmetry element"""
         if isinstance(other, symmetry_element):
+            # * Вектора трансляции элементов симметрии должны быть равны или 
+            # * один из них может быть равным нулю, в этом случае вектор трансляции нового элемента симметрии
+            # * присвается ненулевым
+            if all(mpm.almosteq(i, j, abs_eps=1e-15) for i, j in zip(self.translation_vector, other.translation_vector)):
+                new_tv = self.translation_vector
+            else:
+                if self.translation_vector == mpm.matrix(3, 1):
+                    new_tv = other.translation_vector
+                elif other.translation_vector == mpm.matrix(3, 1):
+                    new_tv = self.translation_vector
+                else:
+                    raise ValueError(f'Translation vectors of two symmetry elements does not equal\n{self} != \n{other}')
             mpm.mp.dps += 10
             new_rotation = self.rotation * other.rotation
             new_translation = self.rotation * other.translation + self.translation
-            self.reduce_translation_part(new_translation, self.translation_vector)
             mpm.mp.dps -= 10
         else:
             raise ValueError(
                 "Symmetry element can be multiplied only for another symmetry element"
             )
-        return symmetry_element(rotation=new_rotation, translation=new_translation)
+        return symmetry_element(rotation=new_rotation, translation=new_translation, translation_vector=new_tv)
 
     def __hash__(self):
         return hash(str(self))
