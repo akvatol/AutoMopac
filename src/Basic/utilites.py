@@ -244,3 +244,22 @@ def detect_group(group: frozenset, axis: str) -> dict:
     for element in preset:
         if element == 'n':
             pass
+
+def _positive_validator(instance, attribute, value):
+    # TODO; Docstring
+    # Validator for point and line groups parameters
+    if value <= 0:
+        raise ValueError('Value vector must be positive')
+
+def _make_srew_axis(q:int, p:int, A:float, axis:str = 'x') -> dict[str, symmetry_element]:
+    # TODO: Docstring
+    rotation_ = make_generators({'n':q, 'axis':axis})
+    rotation = rotation_['n'].rotation
+    translation_part = mpm.fmul(A, (mpm.fdiv(p, q)))
+    screw_generators = {
+        'x':symmetry_element(rotation=rotation, translation=mpm.matrix([translation_part, 0, 0]), translation_vector=mpm.matrix([A, 0, 0]),),
+        'y':symmetry_element(rotation=rotation, translation=mpm.matrix([0, translation_part, 0]), translation_vector=mpm.matrix([0, A, 0]),),
+        'z':symmetry_element(rotation=rotation, translation=mpm.matrix([0, 0, translation_part]), translation_vector=mpm.matrix([0, 0, A]),),
+        }
+
+    return {'q':screw_generators[axis]}
