@@ -115,7 +115,6 @@ class symmetry_element:
             if mpm.almosteq(tv[i], 0, abs_eps=1e-8):
                 new_tp[i] = 0
             else:
-                # TODO: Вот она вроде приравнивает всё к нулю, протестить
                 new_tp[i] = mpm.fsub(tp[i], mpm.fmul(tv[i], int(mpm.fdiv(tp[i], tv[i]))))
 
         return new_tp
