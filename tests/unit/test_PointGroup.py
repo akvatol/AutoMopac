@@ -94,3 +94,13 @@ def test_popgen():
 @pytest.mark.skip(reason='There is a bug')
 def test_find_extra_generators(group, expected):
     assert set(group.find_extra_generators()) == set(expected)
+
+def test_PG_raise():
+    pg = PointGroup(n=4)
+    with pytest.raises(Exception):
+        pg.n = 4
+
+def test_copy():
+    pg1 = PointGroup(n=3)
+    pg2 = pg1.copy()
+    assert pg1 == pg2
