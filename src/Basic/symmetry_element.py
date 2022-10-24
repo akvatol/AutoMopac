@@ -9,6 +9,7 @@ from src.Basic.Atom import Atom
 mpm.mp.mpds = 100
 # Note that symmetry_element objects very sensitive to parameter mpm.mp.dps
 
+# TODO: refactore this
 class symmetry_element:
     """Matrix representation of symmetry element. Contain both translational and rotational part of symmetry element."""
 
@@ -61,9 +62,8 @@ class symmetry_element:
         return float("inf")
 
     def apply(self, atom: Atom) -> Atom:
-        # TODO: test it
         """Apply symmetry element to given atom."""
-        return Atom(atom.atom, mpm.chop(self.rotation * atom.coordinates + self.translation))
+        return Atom(atom.atom, coordinates=mpm.chop((self.rotation * atom.coordinates) + self.translation))
 
     def rotation_eq(self, other):
         """Check if rotational part of two symmetry elements are equal."""
@@ -85,11 +85,11 @@ class symmetry_element:
             eq = False
         return eq
 
-    def get_all_powers(self):
+    def get_all_powers(self) -> frozenset:
         n = self.order
         if n == float("inf"):
             raise ValueError(f"Order of element {self} to big or cannot be defined")
-        return tuple(self**i for i in range(1, n + 1))
+        return frozenset(self**i for i in range(1, n + 1))
 
     def __eq__(self, other):
         """Check if rotational part of symmetry elements is exacly the same. **May give wrong answer if elements contain translation**!!!"""
@@ -115,6 +115,7 @@ class symmetry_element:
             if mpm.almosteq(tv[i], 0, abs_eps=1e-8):
                 new_tp[i] = 0
             else:
+                # TODO: Вот она вроде приравнивает всё к нулю, протестить
                 new_tp[i] = mpm.fsub(tp[i], mpm.fmul(tv[i], int(mpm.fdiv(tp[i], tv[i]))))
 
         return new_tp
@@ -136,11 +137,20 @@ class symmetry_element:
     def __hash__(self):
         return hash(str(self))
 
-    def __pow__(self, other):
+    def __pow__(self, other:int):
         """Return power of curent symmentry element.
         """
 
         new_rotation = self.rotation**other
         new_translation = self.translation * other
-        self.reduce_translation_part(new_translation, self.translation_vector)
-        return symmetry_element(rotation=new_rotation, translation=new_translation)
+        return symmetry_element(rotation=new_rotation, translation=new_translation, translation_vector=self.translation_vector)
+
+
+def main():
+    SA = symmetry_element(rotation=mpm.matrix([[1, 0, 0],[0, -1, 0],[0, 0, -1]]), translation=mpm.matrix([5, 0, 0]), translation_vector=mpm.matrix([10, 0, 0]))
+    print(SA)
+    print(SA.get_all_powers())
+
+if __name__ == '__main__':
+    main()
+
