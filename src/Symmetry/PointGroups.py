@@ -1,16 +1,17 @@
+from dataclasses import dataclass
 from src.Basic.symmetry_element import symmetry_element
 from ..Basic.Templates import GroupTemplate
 from ..Basic.Atom import Atom
 from src.Basic.utilites import make_generators, make_group, detect_group
-from attr import frozen, field
+from attrs import frozen, field
 
 @frozen(slots=True)
-class PointGroup(GroupTemplate):
+class PointGroupBase(GroupTemplate):
     n: int = field(default=1, kw_only=True)
-    v: bool = field(default=False, kw_only=True)
-    h: bool = field(default=False, kw_only=True)
-    I: bool = field(default=False, kw_only=True)
-    U: bool = field(default=False, kw_only=True)
+    v: bool = field(default=False)
+    h: bool = field(default=False)
+    I: bool = field(default=False)
+    U: bool = field(default=False)
     axis: str = field(default='x', kw_only=True)
     __generators: dict = field(init=False, repr=False)
     __group: frozenset[symmetry_element] = field(init=False, repr=False)
@@ -33,21 +34,7 @@ class PointGroup(GroupTemplate):
     def group(self):
         return self.__group
 
-    @classmethod
-    def from_dict(cls, parameter: dict):
-        return cls(
-            n=parameter.get("n", 1),
-            I=parameter.get("I", False),
-            U=parameter.get("U", False),
-            v=parameter.get("v", False),
-            h=parameter.get("h", False),
-        )
-
-    def to_dict(self):
-        return dict(n=self.n, I=self.I, U=self.U, v=self.v, h=self.h)
-
-    def copy(self):
-        return self.from_dict(self.to_dict())
+class PointGroup(PointGroupBase):
 
     def get_orbit(self, atom: Atom) -> dict[Atom:list[Atom]]:
         """Возвращает словарь вида {Atom:[Atom, Atom1, Atom2 ..., AtomN]}, где Atom1, Atom2 ..., AtomN получены из Atom преобразованияями симметрии
@@ -87,11 +74,12 @@ class PointGroup(GroupTemplate):
                     subgroup_elements.append(element)
                 else:
                     pass
+            # TODO: Сделать чтобы работало
             subgroup_parameters = detect_group(subgroup_elements, self.axis)
             subgroup = self.from_dict(subgroup_parameters)
         return subgroup
 
-    def apply(self, atoms: tuple) -> frozenset:
+    def apply(self, atoms: list[Atom]) -> frozenset[Atom]:
         """Apply all symmetry elements for set of atoms.
 
         Args:
@@ -122,3 +110,19 @@ class PointGroup(GroupTemplate):
             parameters[gen_name] = new_gen_value
 
         return generator, self.from_dict(parameter=parameters)
+
+    def copy(self):
+        return self.from_dict(self.to_dict())
+
+    def to_dict(self):
+        return dict(n=self.n, I=self.I, U=self.U, v=self.v, h=self.h)
+
+    @classmethod
+    def from_dict(cls, parameter: dict):
+        return cls(
+            n=parameter.get("n", 1),
+            I=parameter.get("I", False),
+            U=parameter.get("U", False),
+            v=parameter.get("v", False),
+            h=parameter.get("h", False),
+        )
