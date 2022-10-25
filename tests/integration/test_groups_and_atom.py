@@ -22,8 +22,7 @@ SAs = (ScrewAxis(q=1, p=1, A=10),
     (PointGroup(n=2, I=True, h=True), A:= Atom.from_string('C 2 0 1'), {A: [A, Atom.from_string('C -2 0 -1'), Atom.from_string('C 2 0 -1'), Atom.from_string('C -2 0 1')]}),
     ])
 def test_PG_get_orbit(PG, atom, expected):
-    assert len(PG.get_orbit(atom).get(atom)) == len(PG.get_orbit(atom).get(atom))
-    assert set(PG.get_orbit(atom).get(atom)) == set(expected.get(atom))
+    assert set(PG.get_orbit(atom)) == set(expected.get(atom))
 
 @pytest.mark.parametrize("SA,atom,expected", [
     (SAs[0], A:= Atom.from_string('C 2 0 1'), {A:[A]}),
@@ -31,4 +30,4 @@ def test_PG_get_orbit(PG, atom, expected):
     (SAs[2], A:= Atom.from_string('C 2 0 0'), {A:[A, Atom.from_string('C 6 0 0'), Atom.from_string('C 10 0 0')]}),
 ])
 def test_SA_get_orbit(SA, atom, expected):
-    assert set(SA.get_orbit(atom).get(atom)) == set(expected.get(atom))
+    assert set(SA.get_orbit(atom)) == set(expected.get(atom))

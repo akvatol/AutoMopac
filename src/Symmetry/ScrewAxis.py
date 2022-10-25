@@ -91,8 +91,10 @@ class ScrewAxis(ScrewAxisBase):
         # TODO: Test it
         # * Screw-axis always change the atom
         structure = []
-        for _order, SE in enumerate(self.group):
-            for atom in atoms:
+
+        for atom in atoms:
+            for _order, SE in enumerate(self.group):
+
                 new_atom = SE.apply(atom)
 
                 # На всякий случай:( Проверка на дурака
@@ -104,7 +106,7 @@ class ScrewAxis(ScrewAxisBase):
                 else:
                     asymmetric = False
 
-                new_atom = atom._orbit
+                new_atom._orbit = atom._orbit
                 new_atom.asymmetric = asymmetric
 
                 structure.append(new_atom)
@@ -118,20 +120,27 @@ class ScrewAxis(ScrewAxisBase):
         # ? Do i need that?
         return ScrewAxis(q=1, p=1, A=self.A)
 
-    def get_orbit(self, atom: Atom):
+    def get_orbit(self, atom: Atom) -> list[Atom]:
         """Возвращает словарь вида {Atom:[Atom, Atom1, Atom2 ..., AtomN]}, где Atom1, Atom2 ..., AtomN получены из Atom преобразованияями симметрии
 
         Returns:
             dict[Atom:list[Atom]]: Словарь содержащий все орбиты 
         """
         # TODO: Test it
-        orbit = {atom:[]}
-        for elements in self.group:
+        orbit = []
+        for num, elements in enumerate(self.group):
+
+            # if num == 0, it is identity opperation, so it is original atom
+            # if num != 0, it is false, because it change atom
+            asymmteric = not num
+
             new_atom = elements.apply(atom)
-            if new_atom in orbit[atom]:
+            new_atom.asymmetric = asymmteric
+
+            if new_atom in orbit:
                 pass
             else:
-                orbit[atom].append(new_atom)
+                orbit.append(new_atom)
 
         return orbit
 

@@ -214,7 +214,7 @@ def make_generators(parameters: dict) -> dict[str, symmetry_element]:
 
     return generators_
 
-def make_group(generators: frozenset) -> tuple:
+def make_group(generators: dict) -> tuple:
     # TODO Docstring
     # TODO: regularize orders of group elements
     """_summary_
@@ -227,16 +227,24 @@ def make_group(generators: frozenset) -> tuple:
     """
     generators_elements = [generators[element].get_all_powers() for element in generators]
     generators_elements.sort(key=len, reverse=True)
-    group = []
+    group = list(generators_elements[0])
 
     # G = x1*H + x2*H + ... + xn*H
-    for num, subgroup in enumerate(generators_elements):
-        if num == 0:
-            group = frozenset(subgroup)
-        else:
-            group = frozenset((i*j for i in group for j in subgroup))
 
-    return group
+    # optimize it
+    for subgroup in generators_elements[1:]:
+        for s_element in subgroup:
+            if s_element in group:
+                continue
+            else:
+                for element in group:
+                    new_element = element*s_element
+                    if new_element in group:
+                        continue
+                    else:
+                        group.append(new_element)
+
+    return tuple(group)
 
 def detect_group(group: frozenset, axis: str) -> dict:
     # TODO: make it

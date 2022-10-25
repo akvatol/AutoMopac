@@ -1,3 +1,4 @@
+from hashlib import new
 from attrs import field, frozen
 
 from src.Basic.Atom import Atom
@@ -16,7 +17,7 @@ class PointGroupBase(GroupTemplate):
     U: bool = field(default=False)
     axis: str = field(default='x', kw_only=True)
     __generators: dict = field(init=False, repr=False)
-    __group: frozenset[symmetry_element] = field(init=False, repr=False)
+    __group: tuple[symmetry_element] = field(init=False, repr=False)
 
     # TODO: Validation for I, v, h, U
 
@@ -38,19 +39,24 @@ class PointGroupBase(GroupTemplate):
 
 class PointGroup(PointGroupBase):
 
-    def get_orbit(self, atom: Atom) -> dict[Atom:list[Atom]]:
-        """Возвращает словарь вида {Atom:[Atom, Atom1, Atom2 ..., AtomN]}, где Atom1, Atom2 ..., AtomN получены из Atom преобразованияями симметрии
+    def get_orbit(self, atom: Atom) -> list[Atom]:
+        # TODO: Docstring
 
-        Returns:
-            dict[Atom:list[Atom]]: Словарь содержащий все орбиты 
-        """
-        orbit = {atom:[]}
-        for elements in self.group:
+        orbit = []
+
+        for num, elements in enumerate(self.group):
+
+            # if num == 0, it is identity opperation, so it is original atom
+            # if num != 0, it is false, because it change atom
+            asymmetric = not num
+
             new_atom = elements.apply(atom)
-            if new_atom in orbit[atom]:
+            new_atom.asymmetric = asymmetric
+
+            if new_atom in orbit:
                 pass
             else:
-                orbit[atom].append(new_atom)
+                orbit.append(new_atom)
 
         return orbit
 
@@ -93,6 +99,7 @@ class PointGroup(PointGroupBase):
         """
         # TODO: Test it
         structure = []
+
         for _orbit, atom in enumerate(atoms):
             for _order, SE in enumerate(self.group):
                 new_atom = SE.apply(atom)
@@ -104,13 +111,8 @@ class PointGroup(PointGroupBase):
 
                 # * Присваиваем номер орбиты и определяем ассиметричен ли атом
                 # * Если атом получен единичным элементом, то он ассиметричен
-                if _order == 0:
-                    new_atom.asymmetric = True
-                else:
-                    new_atom.asymmetric = False
-
-                new_atom._orbit = _orbit
-
+                new_atom.asymmetric = not _order
+                new_atom._orbit = _orbit + 1
                 structure.append(new_atom)
 
         return tuple(structure)
