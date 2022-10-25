@@ -20,11 +20,11 @@ SAs = (ScrewAxis(q=1, p=1, A=10),
 def test_from_dict(SA, expected):
     assert ScrewAxis.from_dict(SA) == expected
 
-@pytest.mark.parametrize("SA,expected", [(SAs[0], dict(q=1, p=1, A=10)),
-                                         (SAs[1], dict(q=2, p=1, A=10)),
-                                         (SAs[2], dict(q=3, p=1, A=12)),
-                                         (SAs[3], dict(q=17, p=6, A=0.100754840323E+02)),
-                                         (SAs[4], dict(q=28, p=17, A=0.167892743723E+02))])
+@pytest.mark.parametrize("SA,expected", [(SAs[0], dict(q=1, p=1, A=10, axis='x')),
+                                         (SAs[1], dict(q=2, p=1, A=10, axis='x')),
+                                         (SAs[2], dict(q=3, p=1, A=12, axis='x')),
+                                         (SAs[3], dict(q=17, p=6, A=0.100754840323E+02, axis='x')),
+                                         (SAs[4], dict(q=28, p=17, A=0.167892743723E+02, axis='x'))])
 def test_to_dict(SA, expected):
     assert SA.to_dict() == expected
 

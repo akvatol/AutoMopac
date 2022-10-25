@@ -143,7 +143,7 @@ class PointGroup(PointGroupBase):
 
     def to_dict(self):
         # TODO: Docstring
-        return dict(n=self.n, I=self.I, U=self.U, v=self.v, h=self.h)
+        return dict(n=self.n, I=self.I, U=self.U, v=self.v, h=self.h, axis=self.axis)
 
     @classmethod
     def from_dict(cls, parameter: dict):
@@ -154,4 +154,5 @@ class PointGroup(PointGroupBase):
             U=parameter.get("U", False),
             v=parameter.get("v", False),
             h=parameter.get("h", False),
+            axis=parameter.get("axis", "x"),
         )

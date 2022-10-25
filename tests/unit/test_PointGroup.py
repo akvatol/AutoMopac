@@ -44,12 +44,12 @@ def test_generators(group, expected):
 @pytest.mark.parametrize(
     "group, expected",
     [
-        (PointGroup(), {'n': 1, 'v': False, 'h': False, 'U': False, 'I':False}),
-        (PointGroup(n=2), {'n': 2, 'v': False, 'h': False, 'U': False, 'I':False}),
-        (PointGroup(n=3), {'n': 3, 'v': False, 'h': False, 'U': False, 'I':False}),
-        (PointGroup(n=3, v=True), {'n': 3, 'v': True, 'h': False, 'U': False, 'I':False}),
-        (PointGroup(n=3, U=True), {'n': 3, 'v': False, 'h': False, 'U': True, 'I':False}),
-        (PointGroup(n=3, U=True, h=True), {'n': 3, 'v': False, 'h': True, 'U': True, 'I':False}),
+        (PointGroup(), {'n': 1, 'v': False, 'h': False, 'U': False, 'I':False, 'axis':'x'}),
+        (PointGroup(n=2), {'n': 2, 'v': False, 'h': False, 'U': False, 'I':False, 'axis':'x'}),
+        (PointGroup(n=3), {'n': 3, 'v': False, 'h': False, 'U': False, 'I':False, 'axis':'x'}),
+        (PointGroup(n=3, v=True), {'n': 3, 'v': True, 'h': False, 'U': False, 'I':False, 'axis':'x'}),
+        (PointGroup(n=3, U=True), {'n': 3, 'v': False, 'h': False, 'U': True, 'I':False, 'axis':'x'}),
+        (PointGroup(n=3, U=True, h=True), {'n': 3, 'v': False, 'h': True, 'U': True, 'I':False, 'axis':'x'}),
     ],
 )
 def test_to_dict(group, expected):

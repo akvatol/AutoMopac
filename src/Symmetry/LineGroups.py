@@ -16,6 +16,7 @@ class LineGroupBase(GroupTemplate):
 
     @property
     def Q(self):
+        # TODO:
         return self.SA.Q
 
     def __repr__(self):
@@ -23,6 +24,7 @@ class LineGroupBase(GroupTemplate):
     
     @__generators.default
     def _make_generators(self):
+        # TODO:
         d = self.PG.generators
         d.update(self.SA.generators)
         return d
@@ -49,6 +51,9 @@ class LineGroupBase(GroupTemplate):
     def group(self):
         return self.__group
 
+    @property
+    def A(self):
+        return self.SA.A
 
 class LineGroup(LineGroupBase):
 
@@ -79,6 +84,15 @@ class LineGroup(LineGroupBase):
                 orbit.append(new_atom)
 
         return {atom:orbit}
+
+    def to_dict(self):
+        # TODO:
+        return dict(PG=self.PG.to_dict(), SA=self.SA.to_dict())
+
+    @classmethod
+    def from_dict(cls, parameters):
+        # TODO:
+        return cls(SA=ScrewAxis.from_dict(parameters['SA']), PG=PointGroup.from_dict(parameters['PG']))
 
     def get_stabilizer(self, atom:Atom) -> PointGroup:
         # TODO: Make it

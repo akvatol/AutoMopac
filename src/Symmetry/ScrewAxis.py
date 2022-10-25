@@ -14,10 +14,10 @@ class ScrewAxisBase(GroupTemplate):
     # TODO: Docstring
     q: int = field(kw_only=True, default=1, validator=_positive_validator)
     p: int = field(kw_only=True, default=1, validator=_positive_validator)
-    A: int = field(kw_only=True, validator=_positive_validator)
+    A: float = field(kw_only=True, validator=_positive_validator)
     axis: str = field(kw_only=True, default='x')
     r: int = field(init=False)
-    Q: int = field(init=False)
+    Q: float = field(init=False)
     
     __generators: dict = field(init=False, repr=False)
     __group: frozenset = field(init=False, repr=False)
@@ -147,7 +147,7 @@ class ScrewAxis(ScrewAxisBase):
     def to_dict(self):
         # TODO: Docstring
         # TODO: Test it
-        return {'q': self.q, 'p':self.p, 'A':self.A}
+        return {'q': self.q, 'p':self.p, 'A':self.A, 'axis':self.axis}
 
     @classmethod
     def from_dict(cls, parameters:dict[str, int]):
