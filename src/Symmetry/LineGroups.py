@@ -1,17 +1,18 @@
-from attrs import define, frozen
+from attrs import field, frozen
 from src.Basic.Atom import Atom
 from src.Basic.Templates import GroupTemplate
 from src.Symmetry.PointGroups import PointGroup
 from src.Symmetry.ScrewAxis import ScrewAxis
+import pysnooper as pnp
 
 
 @frozen(slots=True)
 class LineGroupBase(GroupTemplate):
-    PG: PointGroup = define(kw_only=True)
-    SA: ScrewAxis = define(kw_only=True)
+    PG: PointGroup = field(kw_only=True)
+    SA: ScrewAxis = field(kw_only=True)
 
-    __generators: dict = define(init=False, repr=False)
-    __group: dict = define(init=False, repr=False)
+    __generators: dict = field(init=False, repr=False)
+    __group: tuple = field(init=False, repr=False)
 
     @property
     def Q(self):
@@ -26,8 +27,8 @@ class LineGroupBase(GroupTemplate):
         d.update(self.SA.generators)
         return d
 
-    @__group.gefault
-    def _make_group(self) -> frozenset:
+    @__group.default
+    def _make_group(self) -> tuple:
         # TODO: regularize orders of group elements
         # * Умножаю все элементы винтовой оси на все элементы точечной группы
         data = []
@@ -35,10 +36,10 @@ class LineGroupBase(GroupTemplate):
             for j in self.PG.group:
                 new_symm = i*j
                 if new_symm in data:
-                    data.append(new_symm)
-                else:
                     pass
-        return frozenset(data)
+                else:
+                    data.append(new_symm)
+        return tuple(data)
 
     @property
     def generators(self):
@@ -54,22 +55,30 @@ class LineGroup(LineGroupBase):
     def apply(self, atoms:list[Atom]):
         # TODO: Docstring
         # TODO: Test it
-        structure = frozenset([SE.apply(atom) for SE in self.group for atom in atoms])
+        monomer = self.PG.apply(atoms)
+        structure = self.SA.apply(monomer)
         return structure
 
     def get_orbit(self, atom:Atom) -> dict:
         # TODO: Docstring
         # TODO: Test it
-        # * Орбита только точечаня группа
-        orbit = {atom:[]}
-        for elements in self.group:
+
+        orbit = []
+        for num, elements in enumerate(self.group):
+
+            # if num == 0, it is identity opperation, so it is original atom
+            # if num != 0, it is false, because it change atom
+            asymmetric = not num
+
             new_atom = elements.apply(atom)
-            if new_atom in orbit[atom]:
+            new_atom.asymmetric = asymmetric
+
+            if new_atom in orbit:
                 pass
             else:
-                orbit[atom].append(new_atom)
+                orbit.append(new_atom)
 
-        return orbit
+        return {atom:orbit}
 
     def get_stabilizer(self, atom:Atom) -> PointGroup:
         # TODO: Make it
