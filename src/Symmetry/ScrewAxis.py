@@ -49,7 +49,7 @@ class ScrewAxisBase(GroupTemplate):
             raise ValueError(f'Generated screw axis does not constent\n q = {instance.q}, screw axis order = {value.order}')
     
     @__group.default
-    def _make_screw_axis_group(self) -> frozenset:
+    def _make_screw_axis_group(self) -> tuple:
         return self.__generators['q'].get_all_powers()
 
     @property
@@ -65,6 +65,7 @@ class ScrewAxis(ScrewAxisBase):
 
     def reduce(self, index: int):
         # TODO: Docstring
+        # TODO: Test it
         if index < self.Q:
             # TODO: Перевести
             raise ValueError("Группа не может быть меньше чем порядок оси Q")
@@ -84,15 +85,35 @@ class ScrewAxis(ScrewAxisBase):
             new_p = find_rp(self.q, self.r)
         return new_q, new_p
 
-    def apply(self, atoms:list[Atom]) -> frozenset:
+    def apply(self, atoms:list[Atom]) -> tuple:
         # TODO: Docstring
         # TODO: Checck if Q = 1 SA works fine
+        # TODO: Test it
         # * Screw-axis always change the atom
-        strucure = tuple([SE.apply(atom) for SE in self.group for atom in atoms])
-        return strucure
+        structure = []
+        for _order, SE in enumerate(self.group):
+            for atom in atoms:
+                new_atom = SE.apply(atom)
+
+                # На всякий случай:( Проверка на дурака
+                if new_atom in structure:
+                    continue
+
+                if _order == 0:
+                    asymmetric = atom.asymmetric
+                else:
+                    asymmetric = False
+
+                new_atom = atom._orbit
+                new_atom.asymmetric = asymmetric
+
+                structure.append(new_atom)
+
+        return tuple(structure)
 
     def get_stabilizer(self, atom:Atom):
         # TODO: Docstring
+        # TODO: Test it
         # * Stabilizer of screw axis is L1 Group
         # ? Do i need that?
         return ScrewAxis(q=1, p=1, A=self.A)
@@ -103,6 +124,7 @@ class ScrewAxis(ScrewAxisBase):
         Returns:
             dict[Atom:list[Atom]]: Словарь содержащий все орбиты 
         """
+        # TODO: Test it
         orbit = {atom:[]}
         for elements in self.group:
             new_atom = elements.apply(atom)
@@ -115,13 +137,16 @@ class ScrewAxis(ScrewAxisBase):
 
     def to_dict(self):
         # TODO: Docstring
+        # TODO: Test it
         return {'q': self.q, 'p':self.p, 'A':self.A}
 
     @classmethod
     def from_dict(cls, parameters:dict[str, int]):
         # TODO: Docstring
+        # TODO: Test it
         return cls(q=parameters.get('q', 1), p=parameters.get('p', 1), A=parameters.get('A'), axis=parameters.get('axis', 'x'))
 
     def copy(self):
         # TODO: Docstring
+        # TODO: Test it
         return self.from_dict(self.to_dict())

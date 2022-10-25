@@ -53,27 +53,46 @@ class LineGroup(LineGroupBase):
 
     def apply(self, atoms:list[Atom]):
         # TODO: Docstring
+        # TODO: Test it
         structure = frozenset([SE.apply(atom) for SE in self.group for atom in atoms])
         return structure
 
     def get_orbit(self, atom:Atom) -> dict:
         # TODO: Docstring
+        # TODO: Test it
         # * Орбита только точечаня группа
-        return self.PG.get_orbit(atom)
+        orbit = {atom:[]}
+        for elements in self.group:
+            new_atom = elements.apply(atom)
+            if new_atom in orbit[atom]:
+                pass
+            else:
+                orbit[atom].append(new_atom)
+
+        return orbit
 
     def get_stabilizer(self, atom:Atom) -> PointGroup:
         # TODO: Make it
-        pass
+        # TODO: Test it
+        # * Элементы винтовой оси не могут быть стабилизатором
+        return self.PG.get_stabilizer(self, atom)
 
-    def reduce(type:str):
-        # TODO
+    def reduce(self, type:str):
+        # TODO: Make it
+        # TODO: Test it
         pass
 
     def reduce_monomer_symmetry(self, generator: str):
+        # TODO: Make it
+        # TODO: Test it
         pass
 
     def reduce_screw_axis(self, index: str):
+        # TODO: Make it
+        # TODO: Test it
         pass
 
     def reduce_glide_plane(self):
+        # TODO: Make it
+        # TODO: Test it
         pass

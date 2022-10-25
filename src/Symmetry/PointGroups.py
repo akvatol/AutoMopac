@@ -1,9 +1,10 @@
-from dataclasses import dataclass
+from attrs import field, frozen
+
+from src.Basic.Atom import Atom
 from src.Basic.symmetry_element import symmetry_element
-from ..Basic.Templates import GroupTemplate
-from ..Basic.Atom import Atom
-from src.Basic.utilites import make_generators, make_group, detect_group
-from attrs import frozen, field
+from src.Basic.Templates import GroupTemplate
+from src.Basic.utilites import detect_group, make_generators, make_group
+
 
 @frozen(slots=True)
 class PointGroupBase(GroupTemplate):
@@ -62,6 +63,7 @@ class PointGroup(PointGroupBase):
         stabilizer_index = len(self.group)/len(self.get_orbit(atom).get(atom))
 
         #TODO: refactore this
+        # TODO: Test it
         if stabilizer_index == len(self.group):
         # Это действие - копирование. 
             subgroup = self.copy()
@@ -89,15 +91,28 @@ class PointGroup(PointGroupBase):
         Returns:
             tuple: generated structue (N1, N1`, N1``, ..., N2, N2`, N2``, ...)
         """
-        # TODO изменить
+        # TODO: Test it
         structure = []
-        for atom in atoms:
-            for SE in self.group:
+        for _orbit, atom in enumerate(atoms):
+            for _order, SE in enumerate(self.group):
                 new_atom = SE.apply(atom)
+
+                # Если атом в списке переходим к следующему шагу
+                # Если нет - продолжаем
                 if new_atom in structure:
                     continue
+
+                # * Присваиваем номер орбиты и определяем ассиметричен ли атом
+                # * Если атом получен единичным элементом, то он ассиметричен
+                if _order == 0:
+                    new_atom.asymmetric = True
                 else:
-                    structure.append(new_atom)
+                    new_atom.asymmetric = False
+
+                new_atom._orbit = _orbit
+
+                structure.append(new_atom)
+
         return tuple(structure)
 
     def popgen(self, gen_name: str):

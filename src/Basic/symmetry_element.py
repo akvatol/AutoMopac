@@ -86,10 +86,11 @@ class symmetry_element:
         return eq
 
     def get_all_powers(self) -> frozenset:
+        # TODO: Docstring
         n = self.order
         if n == float("inf"):
             raise ValueError(f"Order of element {self} to big or cannot be defined")
-        return frozenset(self**i for i in range(1, n + 1))
+        return tuple(self**i for i in range(0, n))
 
     def __eq__(self, other):
         """Check if rotational part of symmetry elements is exacly the same. **May give wrong answer if elements contain translation**!!!"""
@@ -99,11 +100,13 @@ class symmetry_element:
             return rot_eq
 
     def __repr__(self):
-        rot_ = "{} {} {}\n{} {} {}\n{} {} {}\n".format(
-            *[mpm.nstr(mpm.chop(i, tol=1e-15)) for i in self.rotation]
+        # TODO: Docstring
+        # TODO: Make stress test
+        rot_ = "{:^20.12E}{:^20.12E}{:^20.12E}\n{:^20.12E}{:^20.12E}{:^20.12E}\n{:^20.12E}{:^20.12E}{:^20.12E}\n".format(
+            *[float(mpm.chop(i, tol=1e-15)) for i in self.rotation]
         )
-        rot_trans_ = rot_ + "{} {} {}".format(
-            *[mpm.nstr(mpm.chop(i, tol=1e-15)) for i in self.translation]
+        rot_trans_ = rot_ + "{:^20.12E}{:^20.12E}{:^20.12E}\n".format(
+            *[float(mpm.chop(i, tol=1e-15)) for i in self.translation]
         )
         return rot_trans_
 
@@ -154,13 +157,3 @@ class symmetry_element:
         new_rotation = self.rotation**other
         new_translation = self.translation * other
         return symmetry_element(rotation=new_rotation, translation=new_translation, translation_vector=self.translation_vector)
-
-
-def main():
-    SA = symmetry_element(rotation=mpm.matrix([[1, 0, 0],[0, -1, 0],[0, 0, -1]]), translation=mpm.matrix([5, 0, 0]), translation_vector=mpm.matrix([10, 0, 0]))
-    print(SA)
-    print(SA.get_all_powers())
-
-if __name__ == '__main__':
-    main()
-

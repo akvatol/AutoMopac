@@ -1,20 +1,17 @@
-from dataclasses import dataclass, field
+from attrs import define, field
 
 import mpmath as mpm
 
 mpm.mp.dps = 100
 
-@dataclass(slots=True)
+@define(slots=True)
 class Atom:
     '''Interface for atoms for easy manipulating with structures
     '''
     atom: str
-    coordinates: mpm.matrix
-    _fragment: int = field(repr=False, default=None)
-    _helix_num: int = field(repr=False, default=None)
-
-    def __post_init__(self):
-        self.coordinates = mpm.matrix(self.coordinates)
+    coordinates: mpm.matrix = field(converter=mpm.matrix)
+    asymmetric: bool = field(repr=True, default=True)
+    _orbit: int = field(repr=False, default=None)
 
     def __repr__(self):
         return f'{self.atom}\t{float(self.coordinates[0]):^20.12E} {float(self.coordinates[1]):^20.12E} {float(self.coordinates[2]):^20.12E}'
@@ -32,3 +29,11 @@ class Atom:
 
     def __hash__(self) -> int:
         return hash(str(self))
+
+    def __eq__(self, other):
+        # TODO: Docstring
+        # TODO: Tests it
+        if isinstance(other, Atom):
+            return (self.atom == other.atom) and (self.coordinates == other.coordinates)
+        else:
+            raise TypeError('Atom object can be compared only with another Atom')

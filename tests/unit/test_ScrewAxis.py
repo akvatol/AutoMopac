@@ -48,3 +48,12 @@ def test_SA(SA, expected):
                                          (SAs[4], mpm.fdiv(mpm.fmul(0.167892743723E+02, 17), 28))])
 def test_generators_translation(SA, expected):
     assert mpm.almosteq(SA.generators['q'].translation[0] - expected, 0, abs_eps=1e-15)
+
+
+@pytest.mark.parametrize("case,error", [({'q':2, 'p':3, 'A':1}, ValueError),
+                                        ({'q':2, 'p':0, 'A':1}, ValueError),
+                                        ({'q':6, 'p':3, 'A':1}, ValueError),
+                                        ({'q':2, 'p':1, 'A':0}, ValueError)])
+def test_SA_raises(case, error):
+    with pytest.raises(error):
+        ScrewAxis.from_dict(case)
