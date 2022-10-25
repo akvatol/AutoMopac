@@ -14,6 +14,9 @@ class Atom:
     _orbit: int = field(repr=False, default=None)
 
     def __repr__(self):
+        return f'{self.atom}\t{float(self.coordinates[0]):^20.12E} {float(self.coordinates[1]):^20.12E} {float(self.coordinates[2]):^20.12E} {"T" if self.asymmetric else "F"} {self._orbit}'
+
+    def __str__(self):
         return f'{self.atom}\t{float(self.coordinates[0]):^20.12E} {float(self.coordinates[1]):^20.12E} {float(self.coordinates[2]):^20.12E}'
 
     @classmethod
