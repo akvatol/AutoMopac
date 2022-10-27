@@ -111,7 +111,7 @@ PRESETS = {
     },
 }
 
-def all_LG1F_generator(q_max: int, n: int, Q_interval: tuple) -> tuple:
+def all_LG1F_generator(q_max: int, Q_interval: tuple) -> tuple:
     # TODO: Refactor this, delete namedtuples
     """Generate all LG with q <= q_max, n = n, and Q_interval[0] <= Q <= Q_interval[1].
 
@@ -124,7 +124,7 @@ def all_LG1F_generator(q_max: int, n: int, Q_interval: tuple) -> tuple:
         tuple: list of sorted line groups (srew-axis if n = 1)
     """
 
-    LineGroup1 = namedtuple("LineGroup1", "Q q p r n")
+    LineGroup1 = namedtuple("LineGroup1", "Q q p")
 
     # (r*p)%q = 1 original formula from Damnjanovich
     q_max = q_max + 1
@@ -143,7 +143,7 @@ def all_LG1F_generator(q_max: int, n: int, Q_interval: tuple) -> tuple:
             continue
         Q = q / r
         if Q >= Q_interval[0] and Q <= Q_interval[1]:
-            data.append(LineGroup1(Q, q * n, p * n, r, n))
+            data.append(LineGroup1(Q, q, p))
 
     return tuple(sorted(data, key=lambda x: x.Q))
 
