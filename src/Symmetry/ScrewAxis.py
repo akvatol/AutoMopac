@@ -20,7 +20,6 @@ class ScrewAxisBase(GroupTemplate):
     Q: float = field(init=False)
     
     __generators: dict = field(init=False, repr=False)
-    __group: frozenset = field(init=False, repr=False)
 
     @p.validator
     def _p_validation(instance, attribute, value):
@@ -47,18 +46,18 @@ class ScrewAxisBase(GroupTemplate):
     def _screw_axis_validation(instance, attribute, value):
         if value.get('q').order != instance.q:
             raise ValueError(f'Generated screw axis does not constent\n q = {instance.q}, screw axis order = {value.order}')
-    
-    @__group.default
-    def _make_screw_axis_group(self) -> tuple:
-        return self.__generators['q'].get_all_powers()
 
     @property
     def group(self):
-        return self.__group
+        return self.__generators['q'].get_all_powers()
 
     @property
     def generators(self):
         return self.__generators
+
+    @property
+    def f(self):
+        return self.A/self.q
 
 
 class ScrewAxis(ScrewAxisBase):
