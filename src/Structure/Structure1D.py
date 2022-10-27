@@ -7,7 +7,7 @@ from src.Symmetry.PointGroups import PointGroup
 from src.Symmetry.ScrewAxis import ScrewAxis
 
 
-@define(kw_only=True)
+@define(kw_only=True, slots=True)
 class Structure1DBase:
     # TODO: Docstring
     # TODO: Test it
@@ -18,7 +18,8 @@ class Structure1DBase:
     status: str = field(default=None)
 
     properties: dict[str, float] = field(repr=False, factory=dict)
-    containers: dict[str, tuple[float]] = field(repr=False, factory=dict)
+    container: dict[str, tuple[float]] = field(repr=False, factory=dict)
+    atomic_prop_container: dict[str, tuple[float]] = field(repr=False, factory=dict)
 
     monomer_C1: tuple[Atom] = field(repr=False, default=None)
     structure_noPG: tuple[Atom] = field(repr=False, default=None)
@@ -84,7 +85,8 @@ class Structure1D(Structure1DBase):
                  containers=self.containers,
                  monomer_C1=self.monomer_C1,
                  structure_noPG=self.structure_noPG,
-                 structure_C1=self.structure_C1)
+                 structure_C1=self.structure_C1,
+                 atomic_prop_container=self.atomic_prop_container)
         return d
 
     @classmethod
@@ -97,7 +99,8 @@ class Structure1D(Structure1DBase):
                 containers=parameters.get('containers'),
                 monomer_C1=parameters.get('monomer_C1'),
                 structure_noPG=parameters.get('structure_noPG'),
-                structure_C1=parameters.get('structure_C1'))
+                structure_C1=parameters.get('structure_C1'),
+                atomic_prop_container=parameters.get('atomic_prop_container'))
         return _
 
     def to_json(self, path):
