@@ -2,9 +2,11 @@ from abc import ABC, abstractmethod
 
 class CalculatorTemplate(ABC):
 
-    def write_input(self, path:str, template:str):
-        with open(path, 'w') as fw:
-            fw.write(template)
+# TODO: Разобраться почему не работает
+#    def __new__(cls):
+#        if not hasattr(cls, 'instance'):
+#             cls.instance = super(CalculatorTemplate, cls).__new__(cls)
+#        return cls.instance
 
     @abstractmethod
     def _make_template(self):

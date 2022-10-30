@@ -1,7 +1,7 @@
 from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
-from subprocess import CompletedProcess, run
+from subprocess import CompletedProcess, call
 from typing import List, Optional, Union
 
 __all__ = ["Process", "execute_process", "execute_processes_concurently"]
@@ -30,7 +30,7 @@ def execute_processes_concurently(processes: List[Process]) -> List[CompletedPro
 
 
 def execute_process(process: Process) -> CompletedProcess:
-    return run(
+    return call(
         executable=process.executable,
         args=process.args,
         timeout=process.timeout,
