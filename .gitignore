@@ -130,3 +130,6 @@ dmypy.json
 
 # vscode stuff
 .vscode/*
+
+# mopac
+examples/test_mop/*
