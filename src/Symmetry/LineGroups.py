@@ -1,16 +1,17 @@
-from attrs import field, frozen
+from attrs import field, define
 from src.Basic.Atom import Atom
 from src.Basic.Templates import GroupTemplate
 from src.Symmetry.PointGroups import PointGroup
 from src.Symmetry.ScrewAxis import ScrewAxis
 
 
-@frozen(slots=True)
+@define(slots=True)
 class LineGroupBase(GroupTemplate):
     PG: PointGroup = field(kw_only=True)
     SA: ScrewAxis = field(kw_only=True)
 
     __generators: dict = field(init=False, repr=False)
+    __group: tuple = field(init=False, repr=False)
 
     @property
     def Q(self):
@@ -46,11 +47,16 @@ class LineGroupBase(GroupTemplate):
 
     @property
     def group(self):
-        return self._make_group()
+        self.__group = self.__group or self._make_group()
+        return self.__group
 
     @property
     def A(self):
         return self.SA.A
+
+    @property
+    def Q(self):
+        return self.SA.Q
 
     @property
     def f(self):
