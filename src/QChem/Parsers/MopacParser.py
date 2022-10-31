@@ -68,7 +68,8 @@ class MopacParser(ParserTemplate):
 
     def run(self, path):
         data = {}
-        data_containers = {'structure':[], 'charges':[]}
+        atomic_prop_container = {'charges':[]}
+        structure = {'structure_xyz':[], 'A':None}
         flag = 'method'
         with open(path, 'r') as fr:
             for line in fr:
@@ -96,7 +97,10 @@ class MopacParser(ParserTemplate):
                 if flag == 'structure':
                     atom = self.read_xyz_line(line)
                     if atom:
-                        data_containers['structure'].append(atom)
+                        if atom.atom.upper() != 'TV':
+                            structure['structure_xyz'].append(atom)
+                        else:
+                            structure['A'] = atom.coordinates[0] if atom.coordinates[0] != 0 else atom.coordinates[1] if atom.coordinates[1] != 0 else atom.coordinates[2]
 
                 if flag == 'prop':
                     if 'FINAL HEAT OF FORMATION' in line:
@@ -120,5 +124,5 @@ class MopacParser(ParserTemplate):
                 if flag == 'charge':
                     charge = self.read_charge(line)
                     if charge:
-                        data_containers['charges'].append(float(charge))
-        return data, data_containers
+                        atomic_prop_container['charges'].append(float(charge))
+        return dict(properties=data, atomic_prop_container=atomic_prop_container, structure_data=structure)

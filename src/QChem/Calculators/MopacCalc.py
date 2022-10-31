@@ -1,39 +1,43 @@
 import os
 from pathlib import Path
-import re
+import pysnooper as pnp
 
 import mpmath as mpm
-from src.QChem.Parsers.MopacParser import MopacParser
 from src.QChem.Parsers.Template import ParserTemplate
-from src.QChem.TaskRunner.TaskRunner import Process, execute_process
+import subprocess
 from src.Structure.Structure1D import Structure1D
 
 from .Template import CalculatorTemplate
 
 
 class MopacCalculator(CalculatorTemplate):
-    
-    def __init__(self, compound:Structure1D, project_dir:Path, parser: ParserTemplate):
-        self.compound = compound
+
+
+    def __init__(self, project_dir:Path, parser: ParserTemplate):
+
+        # TODO: Refactore this
+        # Delete __init___ put everything in functions
+
         self.root_dir = project_dir
         self.parser = parser
 
-    def _make_template(self):
-        template =['AUX LARGE CHARGE=0 SINGLET GEO-OK PM6-D3 HESS=10 NOREOR PDBOUT PRTXYZ  ITRY=500  NOSYM', '\n']
-        for atom in self.compound:
-            atom_ = atom.split()
-            _ = f'{atom_[0]} {atom_[1]} * {atom_[2]} * {atom_[3]} *\n'
+    def _make_template(self, compound:Structure1D) -> str:
+        template =['AUX LARGE CHARGE=0 SINGLET GEO-OK NOREOR HESS=0 PDBOUT PRTXYZ ITRY=500 AM1 NOSYM RECALC=10\n', '\n\n']
+        for atom in compound.structure:
+            atom_ = str(atom).split()
+            _ = f'{atom_[0]} {atom_[1]} 1 {atom_[2]} 1 {atom_[3]} 1\n'
             template.append(_)
-        A = self.compound.A
-        tv = f'tv {str(A) + " *" if self.compound.SA.axis == "x" else 0} {str(A) + " *" if self.compound.SA.axis == "y" else 0} {str(A) + " *" if self.compound.SA.axis == "y" else 0}'
+        A = compound.A
+        tv = f'tv {str(A) + " 1" if compound.LG.SA.axis == "x" else "0.0 0"} {str(A) + " 1" if compound.LG.SA.axis == "y" else "0.0 0"} {str(A) + " 1" if compound.LG.SA.axis == "y" else "0.0 0"}\n'
         template.append(tv)
         return ''.join(template)
 
-    def save_input(self, template:str):
-        angle = mpm.fdiv(360, self.compound.LG.SA.Q)
-        angle_q_p = f'{angle}_{self.compound.LG.SA.q}_{self.compound.LG.SA.p}'
+        # TODO: Убрать compound из аргументов
+    def save_input(self, template:str, compound:Structure1D) -> Path:
+        angle = mpm.nstr(mpm.fdiv(360, compound.LG.SA.Q), n=8)
+        angle_q_p = f'{angle}_{compound.LG.SA.q}_{compound.LG.SA.p}'
         # This calc dir
-        new_path = self.root_dir / mpm.nstr(angle_q_p, n=8)
+        new_path = self.root_dir / angle_q_p
 
         # Создали папку
         if new_path.is_dir():
@@ -45,20 +49,21 @@ class MopacCalculator(CalculatorTemplate):
         with open(new_path / 'input.mop', 'w') as fw:
             fw.write(template)
 
-        return new_path
+        return new_path # calc_dir
 
-    def run_task(self, inputdir:Path, exec:str = 'mopac'):
-        process = Process(args=[inputdir / 'input.mop'], executable=exec)
-        return execute_process(process)
+    def run_task(self, calc_dir:Path, exec:str = 'mopac'):
+        subprocess.call([exec, calc_dir/'input.mop'])
 
-    def read_output(self, inputdir:Path):
-        return self.parser.run(inputdir / 'input.out')
+    def read_output(self, calc_dir:Path):
+        return self.parser.run(calc_dir / 'input.out')
 
-    def run(self, exec:str = 'mopac'):
+    def run(self, compound:Structure1D, exec:str = 'mopac'):
         # Make intput
-        calc_dir = self.save_input(self._make_template())
+        compound = compound
+        calc_dir = self.save_input(self._make_template(compound=compound), compound=compound)
+        print(calc_dir)
         # Run it
-        self.run_task(inputdir=calc_dir, exec=exec)
+        self.run_task(calc_dir=calc_dir, exec=exec)
         # Parse input
-        data_scalars, data_arrays = self.read_output(calc_dir)
-        return data_scalars, data_arrays
+        data = self.read_output(calc_dir)
+        return data
