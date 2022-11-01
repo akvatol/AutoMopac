@@ -1,12 +1,11 @@
-from attrs import field, frozen
+from attrs import field, define
 from src.Basic.Atom import Atom
 from src.Basic.Templates import GroupTemplate
 from src.Symmetry.PointGroups import PointGroup
 from src.Symmetry.ScrewAxis import ScrewAxis
-import pysnooper as pnp
 
 
-@frozen(slots=True)
+@define(slots=True)
 class LineGroupBase(GroupTemplate):
     PG: PointGroup = field(kw_only=True)
     SA: ScrewAxis = field(kw_only=True)
@@ -29,7 +28,6 @@ class LineGroupBase(GroupTemplate):
         d.update(self.SA.generators)
         return d
 
-    @__group.default
     def _make_group(self) -> tuple:
         # TODO: regularize orders of group elements
         # * Умножаю все элементы винтовой оси на все элементы точечной группы
@@ -49,11 +47,20 @@ class LineGroupBase(GroupTemplate):
 
     @property
     def group(self):
+        self.__group = self.__group or self._make_group()
         return self.__group
 
     @property
     def A(self):
         return self.SA.A
+
+    @property
+    def Q(self):
+        return self.SA.Q
+
+    @property
+    def f(self):
+        return self.SA.f
 
 class LineGroup(LineGroupBase):
 

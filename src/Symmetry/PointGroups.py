@@ -17,6 +17,7 @@ class PointGroupBase(GroupTemplate):
     U: bool = field(default=False)
     axis: str = field(default='x', kw_only=True)
     __generators: dict = field(init=False, repr=False)
+    # Оставил этот параметр т.к. не влият на производительность. Мы всегда используем всего 1 точечную группу
     __group: tuple[symmetry_element] = field(init=False, repr=False)
 
     # TODO: Validation for I, v, h, U
