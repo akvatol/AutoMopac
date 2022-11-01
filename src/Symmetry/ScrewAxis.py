@@ -146,7 +146,7 @@ class ScrewAxis(ScrewAxisBase):
     def to_dict(self):
         # TODO: Docstring
         # TODO: Test it
-        return {'q': self.q, 'p':self.p, 'A':self.A, 'axis':self.axis}
+        return {'q': self.q, 'p':self.p, 'A':float(self.A), 'axis':self.axis}
 
     @classmethod
     def from_dict(cls, parameters:dict[str, int]):
