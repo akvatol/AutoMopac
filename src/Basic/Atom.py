@@ -34,9 +34,9 @@ class Atom:
         return hash(str(self))
 
     def __eq__(self, other):
-        # TODO: Docstring
-        # TODO: Tests it
+        """Check if two atom have equal coordinates and elements. Raise an ValueError if non-atom object passed.
+        """
         if isinstance(other, Atom):
             return (self.atom == other.atom) and (self.coordinates == other.coordinates)
         else:
-            raise TypeError('Atom object can be compared only with another Atom')
+            raise ValueError('Atom object can be compared only with another Atom')

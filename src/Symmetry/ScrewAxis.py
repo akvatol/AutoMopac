@@ -1,5 +1,5 @@
 from attrs import field, frozen
-from src.Basic.symmetry_element import symmetry_element
+from src.Basic.SymmetryElement import SymmetryElement
 
 from src.Basic.Templates import GroupTemplate
 from src.Basic.Atom import Atom
@@ -39,7 +39,7 @@ class ScrewAxisBase(GroupTemplate):
         return self.q/self.r
 
     @__generators.default
-    def _srew_axis_generator(self) -> symmetry_element:
+    def _srew_axis_generator(self) -> SymmetryElement:
         return _make_srew_axis(q=self.q, p=self.p, A=self.A, axis=self.axis)
 
     @__generators.validator

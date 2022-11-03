@@ -1,6 +1,6 @@
 import pytest
 from src.Basic.Atom import Atom
-from src.Basic.symmetry_element import symmetry_element
+from src.Basic.SymmetryElement import SymmetryElement
 from src.Symmetry.ScrewAxis import ScrewAxis
 import mpmath as mpm
 
@@ -39,7 +39,7 @@ def test_groups_len(SA, expected):
 @pytest.mark.parametrize("SA,expected", [(SAs[1], 2),
                                          (SAs[1], 2)])
 def test_SA(SA, expected):
-    assert SA.generators['q'] == symmetry_element(rotation=mpm.matrix([[1, 0, 0],[0, -1, 0],[0, 0, -1]]), translation=mpm.matrix([5, 0, 0]), translation_vector=mpm.matrix([10, 0, 0]))
+    assert SA.generators['q'] == SymmetryElement(rotation=mpm.matrix([[1, 0, 0],[0, -1, 0],[0, 0, -1]]), translation=mpm.matrix([5, 0, 0]), translation_vector=mpm.matrix([10, 0, 0]))
 
 @pytest.mark.parametrize("SA,expected", [(SAs[0], 0),
                                          (SAs[1], 5),

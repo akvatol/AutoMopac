@@ -1,7 +1,7 @@
 from tokenize import group
 import mpmath as mpm
 import pytest
-from src.Basic.symmetry_element import symmetry_element
+from src.Basic.SymmetryElement import SymmetryElement
 from src.Symmetry.PointGroups import PointGroup
 from src.Basic.utilites import SymmetryElements
 
@@ -30,11 +30,11 @@ def test_group_len(group, expected):
         (PointGroup(n=3), {'n': make_cn(3)}),
         (PointGroup(n=3, v=True),
          {'n': make_cn(3),
-          'v':symmetry_element(rotation=mpm.matrix([[1, 0, 0], [0, -1, 0], [0, 0, 1]]))}),
+          'v':SymmetryElement(rotation=mpm.matrix([[1, 0, 0], [0, -1, 0], [0, 0, 1]]))}),
         (PointGroup(n=3, U=True, h=True),
          {'n': make_cn(3),
-          'h': symmetry_element(rotation=mpm.matrix([[-1, 0, 0], [0, 1, 0], [0, 0, 1]])),
-          'U':symmetry_element(rotation=mpm.matrix([[-1, 0, 0], [0, 1, 0], [0, 0, -1]]))}),
+          'h': SymmetryElement(rotation=mpm.matrix([[-1, 0, 0], [0, 1, 0], [0, 0, 1]])),
+          'U':SymmetryElement(rotation=mpm.matrix([[-1, 0, 0], [0, 1, 0], [0, 0, -1]]))}),
     ],
 )
 def test_generators(group, expected):
@@ -71,11 +71,11 @@ def test_from_dict(group, expected):
 
 def test_popgen():
     assert PointGroup(n=3, v=True).popgen('n') == (make_cn(3), PointGroup(v=True))
-    assert PointGroup(n=3, U=True).popgen('U') == (symmetry_element(rotation=mpm.matrix([[-1, 0, 0], [0, 1, 0], [0, 0, -1]])), PointGroup(n=3))
-    assert PointGroup(n=4, v=True).popgen('v') == (symmetry_element(rotation=mpm.matrix([[1, 0, 0], [0, -1, 0], [0, 0, 1]])), PointGroup(n=4))
-    assert PointGroup(n=5, h=True).popgen('h') == (symmetry_element(rotation=mpm.matrix([[-1, 0, 0], [0, 1, 0], [0, 0, 1]])), PointGroup(n=5))
-    assert PointGroup(n=6, I=True).popgen('I') == (symmetry_element(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]])), PointGroup(n=6))
-    assert PointGroup(n=3, U=True, h=True).popgen('h') == (symmetry_element(rotation=mpm.matrix([[-1, 0, 0], [0, 1, 0], [0, 0, 1]])), PointGroup(n=3, U=True))
+    assert PointGroup(n=3, U=True).popgen('U') == (SymmetryElement(rotation=mpm.matrix([[-1, 0, 0], [0, 1, 0], [0, 0, -1]])), PointGroup(n=3))
+    assert PointGroup(n=4, v=True).popgen('v') == (SymmetryElement(rotation=mpm.matrix([[1, 0, 0], [0, -1, 0], [0, 0, 1]])), PointGroup(n=4))
+    assert PointGroup(n=5, h=True).popgen('h') == (SymmetryElement(rotation=mpm.matrix([[-1, 0, 0], [0, 1, 0], [0, 0, 1]])), PointGroup(n=5))
+    assert PointGroup(n=6, I=True).popgen('I') == (SymmetryElement(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]])), PointGroup(n=6))
+    assert PointGroup(n=3, U=True, h=True).popgen('h') == (SymmetryElement(rotation=mpm.matrix([[-1, 0, 0], [0, 1, 0], [0, 0, 1]])), PointGroup(n=3, U=True))
 
 @pytest.mark.parametrize(
     "group, expected",

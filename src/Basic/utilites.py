@@ -4,7 +4,7 @@ from collections import namedtuple
 import mpmath as mpm
 import numpy as np
 from src.Basic.Atom import Atom
-from src.Basic.symmetry_element import symmetry_element
+from src.Basic.SymmetryElement import SymmetryElement
 from dataclasses import dataclass
 
 mpm.mp.mpds = 100
@@ -19,23 +19,23 @@ class Singleton(type):
 @dataclass(slots=True, frozen=True)
 class SymmetryElements(metaclass=Singleton):
     # ? Возможно стоит перенести этот класс в отдельный файл
-    I = symmetry_element(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]))
-    sigma_xz = symmetry_element(rotation=mpm.matrix([[1, 0, 0], [0, -1, 0], [0, 0, 1]]))
-    sigma_yz = symmetry_element(rotation=mpm.matrix([[-1, 0, 0], [0, 1, 0], [0, 0, 1]]))
-    sigma_yx = symmetry_element(rotation=mpm.matrix([[1, 0, 0], [0, 1, 0], [0, 0, -1]]))
-    C2x = symmetry_element(rotation=mpm.matrix([[1, 0, 0], [0, -1, 0], [0, 0, -1]]))
-    C2y = symmetry_element(rotation=mpm.matrix([[-1, 0, 0], [0, 1, 0], [0, 0, -1]]))
-    C2z = symmetry_element(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, 1]]))
+    I = SymmetryElement(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]))
+    sigma_xz = SymmetryElement(rotation=mpm.matrix([[1, 0, 0], [0, -1, 0], [0, 0, 1]]))
+    sigma_yz = SymmetryElement(rotation=mpm.matrix([[-1, 0, 0], [0, 1, 0], [0, 0, 1]]))
+    sigma_yx = SymmetryElement(rotation=mpm.matrix([[1, 0, 0], [0, 1, 0], [0, 0, -1]]))
+    C2x = SymmetryElement(rotation=mpm.matrix([[1, 0, 0], [0, -1, 0], [0, 0, -1]]))
+    C2y = SymmetryElement(rotation=mpm.matrix([[-1, 0, 0], [0, 1, 0], [0, 0, -1]]))
+    C2z = SymmetryElement(rotation=mpm.matrix([[-1, 0, 0], [0, -1, 0], [0, 0, 1]]))
 
     @staticmethod
-    def make_cn_z(n: int) -> symmetry_element:
+    def make_cn_z(n: int) -> SymmetryElement:
         """Support function for make Cn symmetry element
 
         Args:
             n (int): axis order
 
         Returns:
-            symmetry_element: Cn group generator
+            SymmetryElement: Cn group generator
         """
         angle = mpm.radians(360 / n)
         rot = mpm.matrix(
@@ -44,17 +44,17 @@ class SymmetryElements(metaclass=Singleton):
             [0, 0, 1]],
         )
         trans = mpm.matrix(3, 1)
-        return symmetry_element(rotation=rot, translation=trans)
+        return SymmetryElement(rotation=rot, translation=trans)
 
     @staticmethod
-    def make_cn_x(n: int) -> symmetry_element:
+    def make_cn_x(n: int) -> SymmetryElement:
         """Support function for make Cn symmetry element
 
         Args:
             n (int): axis order
 
         Returns:
-            symmetry_element: Cn group generator
+            SymmetryElement: Cn group generator
         """
         angle = mpm.radians(360 / n)
         rot = mpm.matrix(
@@ -65,17 +65,17 @@ class SymmetryElements(metaclass=Singleton):
             ]
         )
         trans = mpm.matrix(3, 1)
-        return symmetry_element(rotation=rot, translation=trans)
+        return SymmetryElement(rotation=rot, translation=trans)
 
     @staticmethod
-    def make_cn_y(n: int) -> symmetry_element:
+    def make_cn_y(n: int) -> SymmetryElement:
         """Support function for make Cn symmetry element
 
         Args:
             n (int): axis order
 
         Returns:
-            symmetry_element: Cn group generator
+            SymmetryElement: Cn group generator
         """
         angle = mpm.radians(360 / n)
         rot = mpm.matrix(
@@ -86,7 +86,7 @@ class SymmetryElements(metaclass=Singleton):
             ]
         )
         trans = mpm.matrix(3, 1)
-        return symmetry_element(rotation=rot, translation=trans)
+        return SymmetryElement(rotation=rot, translation=trans)
 
 # TODO: refactor this
 # http://www.pci.tu-bs.de/aggericke/PC4e/Kap_IV/Matrix_Symm_Op.htm
@@ -190,7 +190,7 @@ def point_group_symbol_parser(symbol: str) -> tuple:
             s3 = search.group(3)
             return s1, s2, s3
 
-def make_generators(parameters: dict) -> dict[str, symmetry_element]:
+def make_generators(parameters: dict) -> dict[str, SymmetryElement]:
     # TODO: DOCSTRING
     """_summary_
 
@@ -260,15 +260,15 @@ def _positive_validator(instance, attribute, value):
     if value <= 0:
         raise ValueError('Value vector must be positive')
 
-def _make_srew_axis(q:int, p:int, A:float, axis:str = 'x') -> dict[str, symmetry_element]:
+def _make_srew_axis(q:int, p:int, A:float, axis:str = 'x') -> dict[str, SymmetryElement]:
     # TODO: Docstring
     rotation_ = make_generators({'n':q, 'axis':axis})
     rotation = rotation_['n'].rotation
     translation_part = mpm.fmul(A, (mpm.fdiv(p, q)))
     screw_generators = {
-        'x':symmetry_element(rotation=rotation, translation=mpm.matrix([translation_part, 0, 0]), translation_vector=mpm.matrix([A, 0, 0]),),
-        'y':symmetry_element(rotation=rotation, translation=mpm.matrix([0, translation_part, 0]), translation_vector=mpm.matrix([0, A, 0]),),
-        'z':symmetry_element(rotation=rotation, translation=mpm.matrix([0, 0, translation_part]), translation_vector=mpm.matrix([0, 0, A]),),
+        'x':SymmetryElement(rotation=rotation, translation=mpm.matrix([translation_part, 0, 0]), translation_vector=mpm.matrix([A, 0, 0]),),
+        'y':SymmetryElement(rotation=rotation, translation=mpm.matrix([0, translation_part, 0]), translation_vector=mpm.matrix([0, A, 0]),),
+        'z':SymmetryElement(rotation=rotation, translation=mpm.matrix([0, 0, translation_part]), translation_vector=mpm.matrix([0, 0, A]),),
         }
 
     return {'q':screw_generators[axis]}

@@ -1,6 +1,6 @@
 import pytest
 from src.Basic.Atom import Atom
-from src.Basic.symmetry_element import symmetry_element
+from src.Basic.SymmetryElement import SymmetryElement
 from src.Symmetry.PointGroups import PointGroup
 from src.Symmetry.ScrewAxis import ScrewAxis
 
