@@ -2,7 +2,7 @@ from hashlib import new
 from attrs import field, frozen
 
 from src.Basic.Atom import Atom
-from src.Basic.symmetry_element import symmetry_element
+from src.Basic.SymmetryElement import SymmetryElement
 from src.Basic.Templates import GroupTemplate
 from src.Basic.utilites import detect_group, make_generators, make_group
 
@@ -18,7 +18,7 @@ class PointGroupBase(GroupTemplate):
     axis: str = field(default='x', kw_only=True)
     __generators: dict = field(init=False, repr=False)
     # Оставил этот параметр т.к. не влият на производительность. Мы всегда используем всего 1 точечную группу
-    __group: tuple[symmetry_element] = field(init=False, repr=False)
+    __group: tuple[SymmetryElement] = field(init=False, repr=False)
 
     # TODO: Validation for I, v, h, U
 
