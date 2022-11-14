@@ -16,6 +16,8 @@ class Singleton(type):
         if cls not in cls._instances:
             cls._instances[cls] = super().__call__(*args, **kwargs)
         return cls._instances[cls]
+
+#TODO: переписать под Attrs
 @dataclass(slots=True, frozen=True)
 class SymmetryElements(metaclass=Singleton):
     # ? Возможно стоит перенести этот класс в отдельный файл

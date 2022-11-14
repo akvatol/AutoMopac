@@ -37,17 +37,13 @@ class HelixBase:
 
 class Helix(HelixBase):
 
-    def run(self, calculator:CalculatorTemplate, parser:ParserTemplate, root_dir:Path, exec:Path, status:str = 'Done'):
-        parser = parser()
-        calc = calculator(root_dir, parser = parser)
-        # TODO
+    def run(self, calculator:CalculatorTemplate, parser:ParserTemplate, root_dir:Path, exec:Path = None, status:str = 'Done'):
         sides = HelixIteratorInit(self.compounds, self.init_compound.Q, direction='right'), HelixIteratorInit(self.compounds, self.init_compound.Q, direction='left')
 
         for side in sides:
-            self._run_side(calculator=calc, side=side)
+            self._run_side(calculator=calculator(), parser = parser(), side=side, exec=exec, root_dir=root_dir)
 
-    # TODO: side - iterator
-    def _run_side(self, calculator, side, status:str = 'Done'):
+    def _run_side(self, calculator, side, parser, root_dir:Path, exec:Path=None, status:str = 'Done'):
         symcell = None
         for compound in side:
             if compound.status == status:
@@ -55,7 +51,10 @@ class Helix(HelixBase):
             else:
                 if symcell:
                     compound.symcell = symcell
-                data = calculator.run(compound)
+                # Калькулятор выдал путь к аут файлу
+                path_to_out = calculator.run(compound, exec=exec, root_dir=root_dir)
+                # Распарсил данные
+                data = parser.run(path_to_out)
                 data.update({'status':status})
                 compound.update(**data)
                 symcell = compound.symcell_from_xyz()

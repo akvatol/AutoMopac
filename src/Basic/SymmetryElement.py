@@ -10,10 +10,14 @@ mpm.mp.mpds = 100
 @frozen(slots=True, kw_only=True)
 class SymmetryElementBase:
     """Frozen классы attrs удобно использовать для создания почти-неизменяемых классов.
-    Здесь реализована вся логика инициализации SymmetryElement.
+    Здесь реализована вся логика инициализации SymmetryElement. See SymmetryElement.
 
     Raises:
         Exception: Если вращательная часть не 3х3 или трансялционная часть или тр не 3х1.
+
+    See:
+        * http://www.pci.tu-bs.de/aggericke/PC4e/Kap_IV/Matrix_Symm_Op.htm
+        * https://www.cryst.ehu.es/html/resources/bogota2018/Bogota2018_3_SymmOper_Students.pdf
     """
     rotation: mpm.matrix = field(init=True, converter=mpm.matrix)
     translation: mpm.matrix = field(converter=mpm.matrix)

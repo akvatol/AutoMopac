@@ -1,28 +1,37 @@
+"""Module contain Calculator for MOPAC programm.
+
+See:
+* https://github.com/openmopac/mopac
+* http://openmopac.net/manual/index.html
+"""
+
 import os
+import subprocess
 from pathlib import Path
-import pysnooper as pnp
 
 import mpmath as mpm
-from src.QChem.Parsers.Template import ParserTemplate
-import subprocess
+
 from src.Structure.Structure1D import Structure1D
 
 from .Template import CalculatorTemplate
 
-
+BASIC_TEMPLATE_MOPAC = 'AUX LARGE CHARGE=0 SINGLET GEO-OK NOREOR HESS=0 PDBOUT PRTXYZ ITRY=500 AM1 NOSYM RECALC=10'
 class MopacCalculator(CalculatorTemplate):
+    """Простой калькулятор для запуска расчетов в прогамме MOPAC. Запуск расчетов осуществляется методом run.
+    """
 
+    def _make_template(self, compound:Structure1D, template: str = BASIC_TEMPLATE_MOPAC) -> str:
+        """Создаёт текст для входного файла MOPAC
 
-    def __init__(self, project_dir:Path, parser: ParserTemplate):
+        Args:
+            compound (Structure1D): Вещество.
+            template (str, optional): Первая строка входного файла (Параметры расчета). Defaults to BASIC_TEMPLATE_MOPAC.
 
-        # TODO: Refactore this
-        # Delete __init___ put everything in functions
-
-        self.root_dir = project_dir
-        self.parser = parser
-
-    def _make_template(self, compound:Structure1D) -> str:
-        template =['AUX LARGE CHARGE=0 SINGLET GEO-OK NOREOR HESS=0 PDBOUT PRTXYZ ITRY=500 AM1 NOSYM RECALC=10\n', '\n\n']
+        Returns:
+            str: _description_
+        """
+        template = template
+        template =[template, '\n', '\n\n']
         for atom in compound.structure:
             atom_ = str(atom).split()
             _ = f'{atom_[0]} {atom_[1]} 1 {atom_[2]} 1 {atom_[3]} 1\n'
@@ -32,12 +41,21 @@ class MopacCalculator(CalculatorTemplate):
         template.append(tv)
         return ''.join(template)
 
-        # TODO: Убрать compound из аргументов
-    def save_input(self, template:str, compound:Structure1D) -> Path:
+    def _save_input(self, template:str, compound:Structure1D, root_dir:Path) -> Path:
+        """Создаёт входной файл для Mopac.
+
+        Args:
+            template (str): Содержание входного файла.
+            compound (Structure1D): Вещество.
+            root_dir (Path): Путь к папке где запускатся расчеты.
+
+        Returns:
+            new_path(Path): путь выходному файлу.
+        """        
         angle = mpm.nstr(mpm.fdiv(360, compound.LG.SA.Q), n=8)
         angle_q_p = f'{angle}_{compound.LG.SA.q}_{compound.LG.SA.p}'
         # This calc dir
-        new_path = self.root_dir / angle_q_p
+        new_path = root_dir / angle_q_p
 
         # Создали папку
         if new_path.is_dir():
@@ -51,19 +69,33 @@ class MopacCalculator(CalculatorTemplate):
 
         return new_path # calc_dir
 
-    def run_task(self, calc_dir:Path, exec:str = 'mopac'):
+    def _run_task(self, calc_dir:Path, exec:str):
+        """Запускает расчет.
+
+        Args:
+            calc_dir (Path): Путь к папке со входным файлом. (Имя входного файла предпологается как input.mop)
+            exec (str): Путь к выполняемому файлу Mopac.
+
+        Returns:
+            (str): путь к выходному файлу.
+        """        
         subprocess.call([exec, calc_dir/'input.mop'])
+        return calc_dir/'input.out'
 
-    def read_output(self, calc_dir:Path):
-        return self.parser.run(calc_dir / 'input.out')
+    def run(self, root_dir:Path, compound:Structure1D, exec:str = None) -> str:
+        """Пайплайн, который запускает квантовохимический расчет.
 
-    def run(self, compound:Structure1D, exec:str = 'mopac'):
+        Args:
+            root_dir (Path): _description_
+            compound (Structure1D): _description_
+            exec (str, optional): _description_. Defaults to None.
+
+        Returns:
+            (str): путь к выходному файлу.
+        """
         # Make intput
-        compound = compound
-        calc_dir = self.save_input(self._make_template(compound=compound), compound=compound)
-        print(calc_dir)
+        calc_dir = self._ave_input(self._make_template(compound=compound), compound=compound, root_dir=root_dir)
         # Run it
-        self.run_task(calc_dir=calc_dir, exec=exec)
-        # Parse input
-        data = self.read_output(calc_dir)
-        return data
+        exec = exec or 'mopac'
+        path_to_out = self._run_task(calc_dir=calc_dir, exec=exec)
+        return path_to_out
